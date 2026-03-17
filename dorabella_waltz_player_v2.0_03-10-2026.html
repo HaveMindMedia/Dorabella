@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dorabella Cipher - The Secret Waltz v2.1 (G Major, 3/4)</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0f;
+  color: #e0d8c8;
+  font-family: 'Georgia', serif;
+  min-height: 100vh;
+  padding: 20px;
+}
+.header {
+  text-align: center;
+  padding: 30px 0 20px;
+  border-bottom: 1px solid #333;
+  margin-bottom: 20px;
+}
+.header h1 {
+  font-size: 1.8em;
+  color: #c9a84c;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.header .subtitle {
+  font-size: 0.95em;
+  color: #888;
+  font-style: italic;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  background: #111118;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+button {
+  background: #1a1a2e;
+  color: #c9a84c;
+  border: 1px solid #c9a84c;
+  padding: 12px 28px;
+  font-size: 1.1em;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: Georgia, serif;
+  transition: all 0.2s;
+}
+button:hover { background: #c9a84c; color: #0a0a0f; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+.tempo-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tempo-control label { color: #888; font-size: 0.9em; }
+.tempo-control input[type="range"] {
+  width: 120px;
+  accent-color: #c9a84c;
+}
+.tempo-control .bpm { color: #c9a84c; font-size: 0.9em; min-width: 60px; }
+select {
+  background: #1a1a2e;
+  color: #c9a84c;
+  border: 1px solid #444;
+  padding: 8px 12px;
+  font-size: 0.9em;
+  border-radius: 4px;
+  font-family: Georgia, serif;
+}
+.info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: #111118;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.85em;
+  color: #888;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.info-bar .current-note {
+  color: #c9a84c;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+.score-container {
+  background: #0d0d14;
+  border: 1px solid #222;
+  border-radius: 8px;
+  padding: 20px;
+  overflow-x: auto;
+}
+.section-label {
+  color: #c9a84c;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin: 16px 0 8px;
+  padding-left: 4px;
+}
+.section-label:first-child { margin-top: 0; }
+.bar-row {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 2px;
+  min-height: 42px;
+}
+.bar-number {
+  width: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: 0.8em;
+  border-right: 1px solid #333;
+  margin-right: 4px;
+}
+.bar-notes {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  border-right: 2px solid #333;
+  padding: 3px 4px;
+  gap: 2px;
+}
+.note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 4px 2px;
+  font-size: 0.75em;
+  transition: all 0.15s;
+  min-width: 0;
+  position: relative;
+}
+.note.half { flex: 3; }
+.note.quarter { flex: 2; }
+.note.eighth { flex: 1; }
+.note .pitch {
+  font-weight: bold;
+  font-size: 1.05em;
+  white-space: nowrap;
+}
+.note .solfege {
+  font-size: 0.8em;
+  color: #777;
+  white-space: nowrap;
+}
+.note .duration-dot {
+  font-size: 0.7em;
+  color: #555;
+}
+.note.beat1 { border-left: 2px solid #c9a84c33; }
+.note.playing {
+  background: #c9a84c;
+  color: #0a0a0f;
+  transform: scale(1.1);
+  box-shadow: 0 0 12px #c9a84c88;
+  z-index: 10;
+}
+.note.playing .solfege { color: #333; }
+.note.playing .duration-dot { color: #555; }
+.note.played { background: #1a1a2e; }
+/* Pitch-based coloring */
+.note.p-do { border-bottom: 2px solid #e74c3c; }
+.note.p-re { border-bottom: 2px solid #e67e22; }
+.note.p-mi { border-bottom: 2px solid #f1c40f; }
+.note.p-fa { border-bottom: 2px solid #2ecc71; }
+.note.p-sol { border-bottom: 2px solid #3498db; }
+.note.p-la { border-bottom: 2px solid #9b59b6; }
+.note.p-ti { border-bottom: 2px solid #e91e63; }
+.note.p-do2 { border-bottom: 2px solid #e74c3c; }
+.bar-text {
+  width: 60px;
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  padding-left: 6px;
+  font-size: 0.7em;
+  color: #555;
+  font-family: monospace;
+}
+.dual-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.dual-row > div { flex: 1; }
+.cipher-text {
+  background: #111118;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+  font-family: monospace;
+  font-size: 0.85em;
+  line-height: 1.8;
+  word-break: break-all;
+}
+.cipher-text .word { color: #c9a84c; font-weight: bold; }
+.cipher-text .noise { color: #444; }
+.legend {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 12px;
+  font-size: 0.8em;
+  color: #666;
+}
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.legend .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.waltz-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4em;
+  color: #555;
+  background: #111;
+  transition: all 0.15s;
+}
+.waltz-indicator.beat1 { border-color: #c9a84c; color: #c9a84c; transform: scale(1.15); }
+.waltz-indicator.beat2 { border-color: #555; color: #888; transform: scale(0.95); }
+.waltz-indicator.beat3 { border-color: #555; color: #888; transform: scale(0.95); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>THE DORABELLA WALTZ</h1>
+  <div class="subtitle">Edward Elgar to Dora Penny &mdash; July 14, 1897</div>
+  <div class="subtitle">87 symbols = 29 bars &times; 3/4 time &mdash; Key of G Major</div>
+</div>
+
+<div class="controls">
+  <button id="playBtn" onclick="togglePlay()">PLAY</button>
+  <button onclick="stopPlayback()">STOP</button>
+  <button onclick="rewind()">REWIND</button>
+  <div class="tempo-control">
+    <label>Tempo:</label>
+    <input type="range" id="tempoSlider" min="50" max="160" value="84" oninput="updateTempo()">
+    <span class="bpm" id="bpmDisplay">100 BPM</span>
+  </div>
+  <div class="tempo-control">
+    <label>Sound:</label>
+    <select id="soundSelect">
+      <option value="piano">Piano</option>
+      <option value="music-box" selected>Music Box</option>
+      <option value="strings">Strings</option>
+      <option value="flute">Flute</option>
+      <option value="clarinet">Clarinet</option>
+    </select>
+  </div>
+  <button id="reverseBtn" onclick="toggleReverse()">FORWARD →</button>
+</div>
+
+<div class="info-bar">
+  <span>Bar: <span id="barNum">-</span> / 29</span>
+  <span>Beat: <span id="beatNum">-</span></span>
+  <span class="current-note" id="currentNote">-</span>
+  <span>Note: <span id="noteIdx">-</span> / 87</span>
+  <span>Section: <span id="sectionName">-</span></span>
+</div>
+
+<div class="score-container" id="scoreContainer">
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#e74c3c"></span> DO (G)</span>
+  <span><span class="dot" style="background:#e67e22"></span> RE (A)</span>
+  <span><span class="dot" style="background:#f1c40f"></span> MI (B)</span>
+  <span><span class="dot" style="background:#2ecc71"></span> FA (C)</span>
+  <span><span class="dot" style="background:#3498db"></span> SOL (D)</span>
+  <span><span class="dot" style="background:#9b59b6"></span> LA (E)</span>
+  <span><span class="dot" style="background:#e91e63"></span> TI (F#)</span>
+</div>
+
+<div class="cipher-text" id="cipherText"></div>
+
+<div class="waltz-indicator" id="waltzDot">3/4</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CIPHER DATA
+// ═══════════════════════════════════════════════
+const S0 = [1,14,4,2,0,7,18,2,9,22,5,16,15,3,16,8,16,16,7,14,14,16,3,21];
+const S1 = [22,21,6,5,17,18,16,18,7,21,2,9,10,2,4,16,16,4,7,6,15,18,16,5,16,7,19,17];
+const S2 = [15,3,21,9,9,21,5,17,4,17,7,19,17,4,3,19,20,6,17,4,16,7,19,15,17,6,2,14,6,17,7,2,3,21,2];
+const CIPHER = [...S0, ...S1, ...S2];
+const N = CIPHER.length; // 87
+
+// Letter mapping
+const LETTER_MAP = {
+  0:'C', 1:'P', 2:'O', 3:'H', 4:'S', 5:'F',
+  6:'Y', 7:'D', 8:'R', 9:'N', 10:'G', 14:'U',
+  15:'T', 16:'E', 17:'I', 18:'L', 19:'W', 20:'B', 21:'A', 22:'M'
+};
+
+// Musical mapping
+const SOLFEGE = ['DO','RE','MI','FA','SOL','LA','TI',"DO'"];
+const PITCH_NAMES = ['G3','A3','B3','C4','D4','E4','F#4','G4'];
+const PITCH_CLASSES = ['p-do','p-re','p-mi','p-fa','p-sol','p-la','p-ti','p-do2'];
+const FREQUENCIES = [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 369.99, 392.00];
+// INVERTED duration: mod3=0→eighth(pickup), mod3=1→quarter, mod3=2→half(bass resonance)
+// This makes G3 (value 2, mod3=2) a HELD bass note — waltz downbeat
+const DUR_NAMES = ['eighth','quarter','half'];
+const DUR_SYMBOLS = ['\uD834\uDD60','\uD834\uDD5F','\uD834\uDD5E'];
+
+// Sections with confirmed words
+const WORD_RANGES = [
+  [12,16,'THERE'], [24,26,'MAY'], [36,37,'GO'], [38,40,'SEE'],
+  [50,53,'WITH'], [52,55,'THAN'], [63,66,'WISH'], [68,69,'BY'],
+  [77,79,'YOU'], [82,83,'DO']
+];
+
+// ═══════════════════════════════════════════════
+// AUDIO ENGINE
+// ═══════════════════════════════════════════════
+let audioCtx = null;
+let isPlaying = false;
+let currentNoteIndex = 0;
+let playTimeout = null;
+let bpm = 84;  // Waltz tempo (gentle waltz = 84-96)
+let isReversed = false;
+let playOrder = null;  // null = forward, array = custom order
+
+function getAudioContext() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playNoteWithGain(freq, duration, time, sound, volume) {
+  // Wrapper that applies waltz dynamics
+  const ctx = getAudioContext();
+  const masterGain = ctx.createGain();
+  masterGain.gain.value = volume || 1.0;
+  masterGain.connect(ctx.destination);
+  playNote(freq, duration, time, sound, masterGain);
+}
+
+function playNote(freq, duration, time, sound, destNode) {
+  const ctx = getAudioContext();
+  const t = time || ctx.currentTime;
+  const dest = destNode || ctx.destination;
+
+  if (sound === 'piano') {
+    // Piano-like: multiple harmonics with fast decay
+    const gain = ctx.createGain();
+    gain.connect(dest);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.25, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration * 0.95);
+
+    [1, 2, 3, 4].forEach((h, i) => {
+      const osc = ctx.createOscillator();
+      const hGain = ctx.createGain();
+      hGain.gain.value = 0.3 / (h * h);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq * h, t);
+      osc.connect(hGain);
+      hGain.connect(gain);
+      osc.start(t);
+      osc.stop(t + duration);
+    });
+  } else if (sound === 'music-box') {
+    // Music box: bright, bell-like
+    const gain = ctx.createGain();
+    gain.connect(dest);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.2, t + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + duration * 0.8);
+    gain.gain.linearRampToValueAtTime(0, t + duration);
+
+    [1, 3, 5].forEach((h) => {
+      const osc = ctx.createOscillator();
+      const hGain = ctx.createGain();
+      hGain.gain.value = 0.25 / h;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq * h, t);
+      osc.connect(hGain);
+      hGain.connect(gain);
+      osc.start(t);
+      osc.stop(t + duration);
+    });
+  } else if (sound === 'strings') {
+    // Strings: sawtooth with slow attack
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freq, t);
+    // Filter
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(freq * 3, t);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(dest);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.12, t + 0.08);
+    gain.gain.setValueAtTime(0.12, t + duration * 0.7);
+    gain.gain.linearRampToValueAtTime(0, t + duration);
+    osc.start(t);
+    osc.stop(t + duration + 0.05);
+  } else if (sound === 'flute') {
+    // Flute: sine with breathy onset
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+    osc.connect(gain);
+    gain.connect(dest);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.18, t + 0.04);
+    gain.gain.setValueAtTime(0.18, t + duration * 0.75);
+    gain.gain.linearRampToValueAtTime(0, t + duration);
+    osc.start(t);
+    osc.stop(t + duration + 0.02);
+    // Breath noise
+    const bufferSize = ctx.sampleRate * 0.05;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.03;
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const nGain = ctx.createGain();
+    nGain.gain.setValueAtTime(0.5, t);
+    nGain.gain.linearRampToValueAtTime(0, t + 0.04);
+    noise.connect(nGain);
+    nGain.connect(dest);
+    noise.start(t);
+  } else if (sound === 'clarinet') {
+    // Clarinet: odd harmonics
+    const gain = ctx.createGain();
+    gain.connect(dest);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.15, t + 0.03);
+    gain.gain.setValueAtTime(0.15, t + duration * 0.8);
+    gain.gain.linearRampToValueAtTime(0, t + duration);
+
+    [1, 3, 5, 7].forEach((h) => {
+      const osc = ctx.createOscillator();
+      const hGain = ctx.createGain();
+      hGain.gain.value = 0.2 / h;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq * h, t);
+      osc.connect(hGain);
+      hGain.connect(gain);
+      osc.start(t);
+      osc.stop(t + duration + 0.02);
+    });
+  }
+}
+
+function getDuration(durClass) {
+  const quarterSec = 60 / bpm;
+  // INVERTED: mod3=0→eighth(pickup), mod3=1→quarter, mod3=2→half(bass)
+  if (durClass === 0) return quarterSec / 2;    // eighth (pickup/passing)
+  if (durClass === 1) return quarterSec;         // quarter
+  return quarterSec * 2;                         // half (resonant bass/held)
+}
+
+function getNoteData(idx) {
+  const v = CIPHER[idx];
+  const pitchDeg = Math.floor(v / 3);
+  const durClass = v % 3;
+  return {
+    value: v,
+    pitchDeg,
+    durClass,
+    freq: FREQUENCIES[pitchDeg],
+    solfege: SOLFEGE[pitchDeg],
+    pitchName: PITCH_NAMES[pitchDeg],
+    pitchClass: PITCH_CLASSES[pitchDeg],
+    durName: DUR_NAMES[durClass],
+    duration: getDuration(durClass),
+    letter: LETTER_MAP[v] || '?',
+    bar: Math.floor(idx / 3) + 1,
+    beat: (idx % 3) + 1,
+    section: idx < 24 ? 'S0' : (idx < 52 ? 'S1' : 'S2')
+  };
+}
+
+function getPlayIndex(seqIdx) {
+  // Maps sequential playback index to actual cipher position
+  if (isReversed) return N - 1 - seqIdx;
+  return seqIdx;
+}
+
+function playNextNote() {
+  if (!isPlaying || currentNoteIndex >= N) {
+    stopPlayback();
+    return;
+  }
+
+  const actualIdx = getPlayIndex(currentNoteIndex);
+  const note = getNoteData(actualIdx);
+  const sound = document.getElementById('soundSelect').value;
+
+  // Waltz dynamics: BUM ta tat — beat 1 full volume, 2-3 softer
+  const waltzGain = note.beat === 1 ? 1.0 : 0.55;
+  // Bass notes (G3, pitch degree 0) get extra sustain and emphasis
+  const isBass = note.pitchDeg === 0;
+  const durMult = isBass ? 1.0 : 0.9;
+  playNoteWithGain(note.freq, note.duration * durMult, null, sound, waltzGain);
+
+  // Update display
+  updateDisplay(actualIdx);
+
+  currentNoteIndex++;
+  playTimeout = setTimeout(playNextNote, note.duration * 1000);
+}
+
+function togglePlay() {
+  if (isPlaying) {
+    isPlaying = false;
+    document.getElementById('playBtn').textContent = 'PLAY';
+    if (playTimeout) clearTimeout(playTimeout);
+  } else {
+    isPlaying = true;
+    document.getElementById('playBtn').textContent = 'PAUSE';
+    getAudioContext().resume();
+    playNextNote();
+  }
+}
+
+function stopPlayback() {
+  isPlaying = false;
+  if (playTimeout) clearTimeout(playTimeout);
+  document.getElementById('playBtn').textContent = 'PLAY';
+  currentNoteIndex = 0;
+  clearHighlights();
+  updateInfoBar(-1);
+}
+
+function rewind() {
+  const wasPlaying = isPlaying;
+  if (isPlaying) {
+    isPlaying = false;
+    if (playTimeout) clearTimeout(playTimeout);
+  }
+  currentNoteIndex = 0;
+  clearHighlights();
+  updateInfoBar(-1);
+  if (wasPlaying) {
+    isPlaying = true;
+    document.getElementById('playBtn').textContent = 'PAUSE';
+    playNextNote();
+  }
+}
+
+function updateTempo() {
+  bpm = parseInt(document.getElementById('tempoSlider').value);
+  document.getElementById('bpmDisplay').textContent = bpm + ' BPM';
+}
+
+function toggleReverse() {
+  isReversed = !isReversed;
+  const btn = document.getElementById('reverseBtn');
+  btn.textContent = isReversed ? '← REVERSE' : 'FORWARD →';
+  btn.style.background = isReversed ? '#c9a84c' : '#1a1a2e';
+  btn.style.color = isReversed ? '#0a0a0f' : '#c9a84c';
+  // Reset playback position
+  const wasPlaying = isPlaying;
+  stopPlayback();
+  if (wasPlaying) togglePlay();
+}
+
+// ═══════════════════════════════════════════════
+// DISPLAY
+// ═══════════════════════════════════════════════
+function buildScore() {
+  const container = document.getElementById('scoreContainer');
+  let html = '';
+  let currentSection = '';
+
+  for (let bar = 0; bar < 29; bar++) {
+    const startIdx = bar * 3;
+    const section = startIdx < 24 ? 'Section 0 (Verse 1)' : (startIdx < 52 ? 'Section 1 (Verse 2)' : 'Section 2 (Verse 3)');
+
+    if (section !== currentSection) {
+      currentSection = section;
+      const sLabel = startIdx < 24 ? 'VERSE 1 - Bars 1-8' : (startIdx < 52 ? 'VERSE 2 - Bars 9-18' : 'VERSE 3 - Bars 19-29');
+      html += `<div class="section-label">${sLabel}</div>`;
+    }
+
+    html += `<div class="bar-row">`;
+    html += `<div class="bar-number">${bar + 1}</div>`;
+    html += `<div class="bar-notes">`;
+
+    const endIdx = Math.min(startIdx + 3, N);
+    let barLetters = '';
+    for (let i = startIdx; i < endIdx; i++) {
+      const note = getNoteData(i);
+      const beatClass = (i - startIdx) === 0 ? ' beat1' : '';
+      barLetters += note.letter;
+      html += `<div class="note ${note.durName} ${note.pitchClass}${beatClass}" id="note-${i}" onclick="playOneNote(${i})">
+        <span class="pitch">${note.pitchName}</span>
+        <span class="solfege">${note.solfege}</span>
+        <span class="duration-dot">${note.durName[0]}</span>
+      </div>`;
+    }
+
+    html += `</div>`;
+    html += `<div class="bar-text">${barLetters}</div>`;
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function buildCipherText() {
+  const container = document.getElementById('cipherText');
+  const text = CIPHER.map(v => LETTER_MAP[v] || '?').join('');
+
+  // Mark word positions
+  const isWord = new Array(N).fill(false);
+  WORD_RANGES.forEach(([start, end, word]) => {
+    for (let i = start; i <= end; i++) isWord[i] = true;
+  });
+
+  let html = '<strong>Surface decode:</strong> ';
+  for (let i = 0; i < N; i++) {
+    const cls = isWord[i] ? 'word' : 'noise';
+    html += `<span class="${cls}" id="ct-${i}">${text[i]}</span>`;
+  }
+  container.innerHTML = html;
+}
+
+function updateDisplay(idx) {
+  // Clear previous
+  document.querySelectorAll('.note.playing').forEach(el => {
+    el.classList.remove('playing');
+    el.classList.add('played');
+  });
+
+  // Highlight current
+  const noteEl = document.getElementById(`note-${idx}`);
+  if (noteEl) {
+    noteEl.classList.add('playing');
+    noteEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+  }
+
+  // Highlight cipher text
+  document.querySelectorAll('.cipher-text span.playing-letter').forEach(el => el.classList.remove('playing-letter'));
+  const ctEl = document.getElementById(`ct-${idx}`);
+  if (ctEl) {
+    ctEl.style.color = '#c9a84c';
+    ctEl.style.fontSize = '1.2em';
+    setTimeout(() => { ctEl.style.fontSize = ''; }, 500);
+  }
+
+  // Update info bar
+  updateInfoBar(idx);
+
+  // Waltz indicator
+  const beat = (idx % 3) + 1;
+  const waltz = document.getElementById('waltzDot');
+  waltz.className = 'waltz-indicator beat' + beat;
+  waltz.textContent = beat;
+}
+
+function updateInfoBar(idx) {
+  if (idx < 0) {
+    document.getElementById('barNum').textContent = '-';
+    document.getElementById('beatNum').textContent = '-';
+    document.getElementById('currentNote').textContent = '-';
+    document.getElementById('noteIdx').textContent = '-';
+    document.getElementById('sectionName').textContent = '-';
+    return;
+  }
+  const note = getNoteData(idx);
+  document.getElementById('barNum').textContent = note.bar;
+  document.getElementById('beatNum').textContent = note.beat + ' of 3';
+  document.getElementById('currentNote').textContent = `${note.solfege} (${note.pitchName}) ${note.durName} = "${note.letter}"`;
+  document.getElementById('noteIdx').textContent = idx + 1;
+  document.getElementById('sectionName').textContent = note.section;
+}
+
+function clearHighlights() {
+  document.querySelectorAll('.note.playing, .note.played').forEach(el => {
+    el.classList.remove('playing', 'played');
+  });
+}
+
+function playOneNote(idx) {
+  getAudioContext().resume();
+  const note = getNoteData(idx);
+  const sound = document.getElementById('soundSelect').value;
+  playNoteWithGain(note.freq, note.duration * 0.9, null, sound, 1.0);
+
+  document.querySelectorAll('.note.playing').forEach(el => el.classList.remove('playing'));
+  const el = document.getElementById(`note-${idx}`);
+  if (el) {
+    el.classList.add('playing');
+    setTimeout(() => el.classList.remove('playing'), note.duration * 900);
+  }
+  updateInfoBar(idx);
+}
+
+// ═══════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  if (e.code === 'Escape') stopPlayback();
+  if (e.code === 'KeyR') rewind();
+  if (e.code === 'ArrowUp') {
+    bpm = Math.min(160, bpm + 5);
+    document.getElementById('tempoSlider').value = bpm;
+    updateTempo();
+  }
+  if (e.code === 'ArrowDown') {
+    bpm = Math.max(60, bpm - 5);
+    document.getElementById('tempoSlider').value = bpm;
+    updateTempo();
+  }
+});
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+buildScore();
+buildCipherText();
+</script>
+</body>
+</html>

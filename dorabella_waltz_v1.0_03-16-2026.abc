@@ -1,0 +1,95 @@
+X:1
+T:The Dorabella Waltz
+T:Decoded from Edward Elgar's 1897 Cipher
+C:Edward Elgar (1897), decoded by Torqual Ravenskye (2026)
+M:3/4
+L:1/4
+Q:1/4=108
+K:G
+%%text Epoch Geometry [1 = -1] — The cipher is the music.
+%%text
+%%text Cipher decomposition: pitch(v) = v // 3, dur(v) = v % 3
+%%text Pitch: 0=G3 1=A3 2=B3 3=C4 4=D4 5=E4 6=F#4 7=G4
+%%text Duration: 0=half(2) 1=quarter(1) 2=eighth(0.5)
+%%text
+%%text NOTE: Bars have irregular beat totals due to cipher dual-encoding.
+%%text ABC L:1/4 means default length = quarter note.
+%%text Half = note2, quarter = note, eighth = note/2
+%%text
+%%text Decoded text: DORALNSAEGCIUTIFIINOOITHGHMCYSISNHAEVARIIRNMUSICINBYUTHEEHCYRYNBYRTBPMYRINBUYMAOMYNATHA
+%%text
+%%text Anchor words: DORA (bar 1), MUSIC (bar 15), THEE (bar 18)
+%%text
+%
+% ==== SECTION S0 (bars 1-8) ====
+%
+% Bar 1: [1,14,4] → D O R (2.5 beats) — "DORA" starts
+"DORA"G d/2 A|\
+% Bar 2: [2,0,7] → A L N (3.5 beats)
+G/2 G2 B|\
+% Bar 3: [18,2,9] → S A E (4.5 beats)
+^f2 G/2 c2|\
+% Bar 4: [22,5,16] → G C I (2.5 beats)
+g A/2 e|\
+% Bar 5: [15,3,16] → U T I (5.0 beats)
+e2 A2 e|\
+% Bar 6: [8,16,16] → F I I (2.5 beats)
+B/2 e e|\
+% Bar 7: [7,14,14] → N O O (2.0 beats)
+B d/2 d/2|\
+% Bar 8: [16,3,21] → I T H (5.0 beats)
+e A2 g2|\
+%
+% ==== SECTION S1 (bars 9-17) ====
+%
+% Bar 9: [22,21,6] → G H M (5.0 beats)
+g g2 B2|\
+% Bar 10: [5,17,18] → C Y S (3.0 beats)
+A/2 e/2 ^f2|\
+% Bar 11: [16,18,7] → I S N (4.0 beats)
+e ^f2 B|\
+% Bar 12: [21,2,9] → H A E (4.5 beats)
+g2 G/2 c2|\
+% Bar 13: [10,2,4] → V A R (2.5 beats)
+c G/2 A|\
+% Bar 14: [16,16,4] → I I R (3.0 beats)
+e e A|\
+% Bar 15: [7,6,15] → N M U (5.0 beats) — "MUSIC" starts at M
+B "MUSIC"B2 e2|\
+% Bar 16: [18,16,5] → S I C (3.5 beats)
+^f2 e A/2|\
+% Bar 17: [16,7,19] → I N B (3.0 beats)
+e B ^f|\
+%
+% ==== SECTION S2 (bars 18-29) ====
+%
+% Bar 18: [17,15,3] → Y U T (4.5 beats) — "THEE" starts at T
+e/2 e2 "THEE"A2|\
+% Bar 19: [21,9,9] → H E E (6.0 beats)
+g2 c2 c2|\
+% Bar 20: [21,5,17] → H C Y (3.0 beats)
+g2 A/2 e/2|\
+% Bar 21: [4,17,7] → R Y N (2.5 beats)
+A e/2 B|\
+% Bar 22: [19,17,4] → B Y R (2.5 beats)
+^f e/2 A|\
+% Bar 23: [3,19,20] → T B P (3.5 beats)
+A2 ^f ^f/2|\
+% Bar 24: [6,17,4] → M Y R (3.5 beats)
+B2 e/2 A|\
+% Bar 25: [16,7,19] → I N B (3.0 beats)
+e B ^f|\
+% Bar 26: [15,17,6] → U Y M (4.5 beats)
+e2 e/2 B2|\
+% Bar 27: [2,14,6] → A O M (3.0 beats)
+G/2 d/2 B2|\
+% Bar 28: [17,7,2] → Y N A (2.0 beats)
+e/2 B G/2|\
+% Bar 29: [3,21,2] → T H A (4.5 beats)
+A2 g2 G/2|]
+%
+% === LYRICS (decoded cipher letters) ===
+W: D O R A L N S A E G C I U T I F I I N O O I T H
+W: G H M C Y S I S N H A E V A R I I R N M U S I C
+W: I N B Y U T H E E H C Y R Y N B Y R T B P M Y R
+W: I N B U Y M A O M Y N A T H A

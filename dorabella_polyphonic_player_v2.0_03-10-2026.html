@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dorabella Cipher — The Secret Waltz (3-Voice Polyphonic)</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0f;
+  color: #e0d8c8;
+  font-family: 'Georgia', serif;
+  min-height: 100vh;
+  padding: 15px;
+}
+.header { text-align: center; padding: 20px 0 15px; border-bottom: 1px solid #333; margin-bottom: 15px; }
+.header h1 { font-size: 1.6em; color: #c9a84c; letter-spacing: 2px; margin-bottom: 6px; }
+.header .subtitle { font-size: 0.9em; color: #888; font-style: italic; }
+.controls {
+  display: flex; align-items: center; justify-content: center;
+  gap: 15px; padding: 15px; background: #111118;
+  border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap;
+}
+button {
+  background: #1a1a2e; color: #c9a84c; border: 1px solid #c9a84c;
+  padding: 10px 22px; font-size: 1em; cursor: pointer;
+  border-radius: 4px; font-family: Georgia, serif; transition: all 0.2s;
+}
+button:hover { background: #c9a84c; color: #0a0a0f; }
+button.active { background: #c9a84c; color: #0a0a0f; }
+.tempo-control { display: flex; align-items: center; gap: 6px; }
+.tempo-control label { color: #888; font-size: 0.85em; }
+.tempo-control input[type="range"] { width: 100px; accent-color: #c9a84c; }
+.tempo-control .bpm { color: #c9a84c; font-size: 0.85em; min-width: 55px; }
+.voice-toggles { display: flex; gap: 8px; }
+.voice-toggles button { padding: 6px 14px; font-size: 0.85em; }
+.voice-toggles button.melody { border-color: #e74c3c; color: #e74c3c; }
+.voice-toggles button.melody.active { background: #e74c3c; color: #fff; }
+.voice-toggles button.harmony { border-color: #3498db; color: #3498db; }
+.voice-toggles button.harmony.active { background: #3498db; color: #fff; }
+.voice-toggles button.bass { border-color: #2ecc71; color: #2ecc71; }
+.voice-toggles button.bass.active { background: #2ecc71; color: #fff; }
+
+.info-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 14px; background: #111118; border-radius: 8px;
+  margin-bottom: 15px; font-size: 0.8em; color: #888; flex-wrap: wrap; gap: 8px;
+}
+.info-bar .current { color: #c9a84c; font-size: 1em; font-weight: bold; }
+
+.score {
+  background: #0d0d14; border: 1px solid #222; border-radius: 8px;
+  padding: 15px; overflow-x: auto; margin-bottom: 15px;
+}
+.bar-group {
+  display: inline-block; vertical-align: top;
+  border-right: 2px solid #333; padding: 0 8px; margin-bottom: 10px;
+  min-width: 120px;
+}
+.bar-group:last-child { border-right: none; }
+.bar-label { text-align: center; color: #666; font-size: 0.75em; margin-bottom: 4px; }
+.beat-col {
+  display: inline-block; vertical-align: top; text-align: center;
+  width: 36px; margin: 0 2px; cursor: pointer; transition: background 0.1s;
+  border-radius: 4px; padding: 2px;
+}
+.beat-col:hover { background: #1a1a2e; }
+.beat-col.playing { background: #2a2a3e; box-shadow: 0 0 8px rgba(201,168,76,0.3); }
+.beat-col.beat1 { border-left: 1px solid #444; }
+
+.voice-note {
+  font-size: 0.7em; padding: 2px 0; border-radius: 2px; margin: 1px 0;
+  min-height: 18px; line-height: 18px;
+}
+.voice-note.melody { color: #e74c3c; }
+.voice-note.harmony { color: #3498db; }
+.voice-note.bass { color: #2ecc71; }
+.voice-note.rest { color: #333; }
+.voice-note.unison { font-weight: bold; text-decoration: underline; }
+
+.lyric-row { font-size: 0.8em; color: #c9a84c; margin-top: 2px; min-height: 16px; }
+.waltz-dot { font-size: 0.6em; color: #555; }
+.waltz-dot.beat1 { color: #c9a84c; font-size: 0.7em; }
+
+.lyrics-display {
+  background: #111118; border-radius: 8px; padding: 12px 16px;
+  margin-bottom: 15px; font-size: 0.9em; line-height: 1.6;
+}
+.lyrics-display h3 { color: #c9a84c; margin-bottom: 8px; font-size: 0.95em; }
+.lyrics-display .verse { margin-bottom: 8px; }
+.lyrics-display .verse-label { color: #666; font-size: 0.8em; }
+.lyrics-display .lyric-text { font-family: 'Courier New', monospace; letter-spacing: 2px; }
+.lyrics-display .lyric-text .highlight { color: #c9a84c; font-weight: bold; }
+.lyrics-display .lyric-text .sung { color: #e74c3c; }
+
+.legend {
+  display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;
+  padding: 8px; font-size: 0.75em; color: #888;
+}
+.legend span { display: flex; align-items: center; gap: 4px; }
+.legend .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>THE SECRET WALTZ</h1>
+  <div class="subtitle">Dorabella Cipher — 3-Voice Polyphonic Score — G Major, 3/4 — 12 Bars</div>
+  <div class="subtitle" style="margin-top:4px">87 symbols = 35 beats across 3 voices — a short waltz Elgar sang to Dora</div>
+</div>
+
+<div class="controls">
+  <button id="playBtn" onclick="togglePlay()">PLAY</button>
+  <button onclick="stopPlayback()">STOP</button>
+  <button onclick="rewind()">REWIND</button>
+  <button id="reverseBtn" onclick="toggleReverse()">FORWARD</button>
+  <div class="tempo-control">
+    <label>Tempo:</label>
+    <input type="range" id="tempoSlider" min="40" max="140" value="76" oninput="updateTempo()">
+    <span class="bpm" id="bpmDisplay">76 BPM</span>
+  </div>
+  <div class="voice-toggles">
+    <button class="melody active" id="toggleMelody" onclick="toggleVoice('melody')">Melody</button>
+    <button class="harmony active" id="toggleHarmony" onclick="toggleVoice('harmony')">Harmony</button>
+    <button class="bass active" id="toggleBass" onclick="toggleVoice('bass')">Bass</button>
+  </div>
+</div>
+
+<div class="info-bar">
+  <span>Bar: <span id="barNum">-</span> / 12</span>
+  <span>Beat: <span id="beatNum">-</span></span>
+  <span class="current" id="currentChord">-</span>
+  <span>Position: <span id="posNum">-</span> / 35</span>
+</div>
+
+<div class="score" id="scoreContainer"></div>
+
+<div class="lyrics-display">
+  <h3>Lyrics (sung on melody line, bars 1-8)</h3>
+  <div class="verse">
+    <span class="verse-label">Bars 1-4:</span>
+    <span class="lyric-text" id="lyrics1"></span>
+  </div>
+  <div class="verse">
+    <span class="verse-label">Bars 5-8:</span>
+    <span class="lyric-text" id="lyrics2"></span>
+  </div>
+  <div class="verse" style="margin-top:8px">
+    <span class="verse-label" style="color:#3498db">Harmony text (S1):</span>
+    <span class="lyric-text" id="lyricsH"></span>
+  </div>
+  <div class="verse">
+    <span class="verse-label" style="color:#2ecc71">Bass text (S2):</span>
+    <span class="lyric-text" id="lyricsB"></span>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#e74c3c"></span> Melody (S0/Treble)</span>
+  <span><span class="dot" style="background:#3498db"></span> Harmony (S1/Middle)</span>
+  <span><span class="dot" style="background:#2ecc71"></span> Bass (S2/Lower)</span>
+  <span style="color:#c9a84c">Unisons = underlined</span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CIPHER DATA — THREE VOICES
+// ═══════════════════════════════════════════════
+const S0 = [1,14,4,2,0,7,18,2,9,22,5,16,15,3,16,8,16,16,7,14,14,16,3,21];
+const S1 = [22,21,6,5,17,18,16,18,7,21,2,9,10,2,4,16,16,4,7,6,15,18,16,5,16,7,19,17];
+const S2 = [15,3,21,9,9,21,5,17,4,17,7,19,17,4,3,19,20,6,17,4,16,7,19,15,17,6,2,14,6,17,7,2,3,21,2];
+
+const LETTER_MAP = {
+  0:'C', 1:'P', 2:'O', 3:'H', 4:'S', 5:'F',
+  6:'Y', 7:'D', 8:'R', 9:'N', 10:'G', 14:'U',
+  15:'T', 16:'E', 17:'I', 18:'L', 19:'W', 20:'B', 21:'A', 22:'M'
+};
+
+const SOLFEGE = ['DO','RE','MI','FA','SOL','LA','TI',"DO'"];
+const NOTE_NAMES = ['G3','A3','B3','C4','D4','E4','F#4','G4'];
+const NOTE_SHORT = ['G','A','B','C','D','E','F#','G+'];
+const FREQS = [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 369.99, 392.00];
+const MAX_BEATS = Math.max(S0.length, S1.length, S2.length); // 35
+
+// Build score data
+const SCORE = [];
+for (let beat = 0; beat < MAX_BEATS; beat++) {
+  const entry = {
+    beat, bar: Math.floor(beat/3)+1, beatInBar: (beat%3)+1,
+    melody: beat < S0.length ? S0[beat] : null,
+    harmony: beat < S1.length ? S1[beat] : null,
+    bass: beat < S2.length ? S2[beat] : null
+  };
+  SCORE.push(entry);
+}
+
+function pitchDeg(v) { return Math.floor(v / 3); }
+function durClass(v) { return v % 3; }
+
+// ═══════════════════════════════════════════════
+// AUDIO ENGINE
+// ═══════════════════════════════════════════════
+let audioCtx = null;
+let isPlaying = false;
+let currentBeat = 0;
+let playTimeout = null;
+let bpm = 76;
+let isReversed = false;
+let voiceEnabled = { melody: true, harmony: true, bass: true };
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone(freq, duration, volume, voiceType) {
+  const ctx = getCtx();
+  const t = ctx.currentTime;
+  const gain = ctx.createGain();
+  gain.connect(ctx.destination);
+
+  if (voiceType === 'melody') {
+    // Bright, singing tone — like a voice
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(volume * 0.22, t + 0.02);
+    gain.gain.setValueAtTime(volume * 0.20, t + duration * 0.7);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+    [1, 2, 3].forEach(h => {
+      const osc = ctx.createOscillator();
+      const hg = ctx.createGain();
+      hg.gain.value = 0.35 / (h * h);
+      osc.type = h === 1 ? 'triangle' : 'sine';
+      osc.frequency.setValueAtTime(freq * h, t);
+      osc.connect(hg); hg.connect(gain);
+      osc.start(t); osc.stop(t + duration);
+    });
+  } else if (voiceType === 'harmony') {
+    // Warm, sustained — like strings
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(volume * 0.14, t + 0.06);
+    gain.gain.setValueAtTime(volume * 0.12, t + duration * 0.8);
+    gain.gain.linearRampToValueAtTime(0, t + duration);
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freq, t);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(freq * 2.5, t);
+    osc.connect(filter); filter.connect(gain);
+    osc.start(t); osc.stop(t + duration + 0.05);
+  } else {
+    // Bass — deep, resonant, longer decay
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(volume * 0.20, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration * 0.95);
+    [1, 2].forEach(h => {
+      const osc = ctx.createOscillator();
+      const hg = ctx.createGain();
+      hg.gain.value = 0.4 / h;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq * h, t);
+      osc.connect(hg); hg.connect(gain);
+      osc.start(t); osc.stop(t + duration);
+    });
+  }
+}
+
+function getDuration() {
+  return 60 / bpm; // One beat = one quarter note
+}
+
+function getPlayIdx(seqIdx) {
+  return isReversed ? MAX_BEATS - 1 - seqIdx : seqIdx;
+}
+
+function playBeat(beatIdx) {
+  const entry = SCORE[beatIdx];
+  if (!entry) return;
+
+  const dur = getDuration();
+  // Waltz dynamics: beat 1 = BUM (loud), 2-3 = ta tat (soft)
+  const waltzVol = entry.beatInBar === 1 ? 1.0 : 0.55;
+
+  if (entry.melody !== null && voiceEnabled.melody) {
+    const p = pitchDeg(entry.melody);
+    playTone(FREQS[p], dur * 0.9, waltzVol, 'melody');
+  }
+  if (entry.harmony !== null && voiceEnabled.harmony) {
+    const p = pitchDeg(entry.harmony);
+    playTone(FREQS[p], dur * 0.85, waltzVol * 0.7, 'harmony');
+  }
+  if (entry.bass !== null && voiceEnabled.bass) {
+    const p = pitchDeg(entry.bass);
+    // Bass gets extra emphasis on beat 1
+    const bassVol = entry.beatInBar === 1 ? waltzVol * 1.1 : waltzVol * 0.5;
+    playTone(FREQS[p] * 0.5, dur * 1.0, bassVol, 'bass'); // Octave down
+  }
+}
+
+function playNext() {
+  if (!isPlaying || currentBeat >= MAX_BEATS) {
+    stopPlayback();
+    return;
+  }
+  const beatIdx = getPlayIdx(currentBeat);
+  playBeat(beatIdx);
+  updateDisplay(beatIdx);
+  currentBeat++;
+  playTimeout = setTimeout(playNext, getDuration() * 1000);
+}
+
+function togglePlay() {
+  if (isPlaying) {
+    isPlaying = false;
+    document.getElementById('playBtn').textContent = 'PLAY';
+    if (playTimeout) clearTimeout(playTimeout);
+  } else {
+    isPlaying = true;
+    document.getElementById('playBtn').textContent = 'PAUSE';
+    getCtx().resume();
+    playNext();
+  }
+}
+
+function stopPlayback() {
+  isPlaying = false;
+  if (playTimeout) clearTimeout(playTimeout);
+  document.getElementById('playBtn').textContent = 'PLAY';
+  currentBeat = 0;
+  document.querySelectorAll('.beat-col.playing').forEach(el => el.classList.remove('playing'));
+  document.getElementById('barNum').textContent = '-';
+  document.getElementById('beatNum').textContent = '-';
+  document.getElementById('currentChord').textContent = '-';
+  document.getElementById('posNum').textContent = '-';
+}
+
+function rewind() {
+  const was = isPlaying;
+  stopPlayback();
+  if (was) togglePlay();
+}
+
+function toggleReverse() {
+  isReversed = !isReversed;
+  const btn = document.getElementById('reverseBtn');
+  btn.textContent = isReversed ? 'REVERSE' : 'FORWARD';
+  btn.classList.toggle('active', isReversed);
+  rewind();
+}
+
+function toggleVoice(voice) {
+  voiceEnabled[voice] = !voiceEnabled[voice];
+  const btn = document.getElementById('toggle' + voice.charAt(0).toUpperCase() + voice.slice(1));
+  btn.classList.toggle('active', voiceEnabled[voice]);
+}
+
+function updateTempo() {
+  bpm = parseInt(document.getElementById('tempoSlider').value);
+  document.getElementById('bpmDisplay').textContent = bpm + ' BPM';
+}
+
+function updateDisplay(beatIdx) {
+  const entry = SCORE[beatIdx];
+  document.getElementById('barNum').textContent = entry.bar;
+  document.getElementById('beatNum').textContent = entry.beatInBar;
+  document.getElementById('posNum').textContent = beatIdx + 1;
+
+  // Build chord name
+  const notes = [];
+  if (entry.melody !== null) notes.push(NOTE_SHORT[pitchDeg(entry.melody)]);
+  if (entry.harmony !== null) notes.push(NOTE_SHORT[pitchDeg(entry.harmony)]);
+  if (entry.bass !== null) notes.push(NOTE_SHORT[pitchDeg(entry.bass)]);
+  const unique = [...new Set(notes)];
+  document.getElementById('currentChord').textContent = unique.join('+');
+
+  // Highlight
+  document.querySelectorAll('.beat-col.playing').forEach(el => el.classList.remove('playing'));
+  const el = document.getElementById('beat-' + beatIdx);
+  if (el) el.classList.add('playing');
+}
+
+function clickBeat(beatIdx) {
+  getCtx().resume();
+  playBeat(beatIdx);
+  updateDisplay(beatIdx);
+}
+
+// ═══════════════════════════════════════════════
+// BUILD SCORE DISPLAY
+// ═══════════════════════════════════════════════
+function buildScore() {
+  const container = document.getElementById('scoreContainer');
+  let html = '';
+  let currentBar = 0;
+
+  for (let beat = 0; beat < MAX_BEATS; beat++) {
+    const entry = SCORE[beat];
+    if (entry.bar !== currentBar) {
+      if (currentBar > 0) html += '</div>';
+      currentBar = entry.bar;
+      html += `<div class="bar-group"><div class="bar-label">Bar ${currentBar}</div>`;
+    }
+
+    const b1class = entry.beatInBar === 1 ? ' beat1' : '';
+    html += `<div class="beat-col${b1class}" id="beat-${beat}" onclick="clickBeat(${beat})">`;
+
+    // Waltz beat indicator
+    const waltzChar = entry.beatInBar === 1 ? '●' : '○';
+    const waltzClass = entry.beatInBar === 1 ? 'beat1' : '';
+    html += `<div class="waltz-dot ${waltzClass}">${waltzChar}</div>`;
+
+    // Melody
+    if (entry.melody !== null) {
+      const p = pitchDeg(entry.melody);
+      const isUnison = (entry.harmony !== null && pitchDeg(entry.harmony) === p) ||
+                       (entry.bass !== null && pitchDeg(entry.bass) === p);
+      html += `<div class="voice-note melody${isUnison ? ' unison' : ''}">${NOTE_SHORT[p]}</div>`;
+    } else {
+      html += `<div class="voice-note rest">—</div>`;
+    }
+
+    // Harmony
+    if (entry.harmony !== null) {
+      const p = pitchDeg(entry.harmony);
+      const isUnison = (entry.melody !== null && pitchDeg(entry.melody) === p) ||
+                       (entry.bass !== null && pitchDeg(entry.bass) === p);
+      html += `<div class="voice-note harmony${isUnison ? ' unison' : ''}">${NOTE_SHORT[p]}</div>`;
+    } else {
+      html += `<div class="voice-note rest">—</div>`;
+    }
+
+    // Bass
+    if (entry.bass !== null) {
+      const p = pitchDeg(entry.bass);
+      const isUnison = (entry.melody !== null && pitchDeg(entry.melody) === p) ||
+                       (entry.harmony !== null && pitchDeg(entry.harmony) === p);
+      html += `<div class="voice-note bass${isUnison ? ' unison' : ''}">${NOTE_SHORT[p]}</div>`;
+    } else {
+      html += `<div class="voice-note rest">—</div>`;
+    }
+
+    // Lyric (from melody line)
+    const lyric = entry.melody !== null ? (LETTER_MAP[entry.melody] || '?') : '';
+    html += `<div class="lyric-row">${lyric}</div>`;
+
+    html += '</div>';
+  }
+  if (currentBar > 0) html += '</div>';
+
+  container.innerHTML = html;
+
+  // Build lyrics display
+  const melLyrics = S0.map(v => LETTER_MAP[v] || '?').join('');
+  const harLyrics = S1.map(v => LETTER_MAP[v] || '?').join('');
+  const basLyrics = S2.map(v => LETTER_MAP[v] || '?').join('');
+
+  document.getElementById('lyrics1').innerHTML = highlightWords(melLyrics.slice(0, 12));
+  document.getElementById('lyrics2').innerHTML = highlightWords(melLyrics.slice(12));
+  document.getElementById('lyricsH').innerHTML = highlightWords(harLyrics);
+  document.getElementById('lyricsB').innerHTML = highlightWords(basLyrics);
+}
+
+function highlightWords(text) {
+  const words = ['THERE','WHERE','THOSE','THESE','THINK','THING','THREE','OTHER',
+    'WOULD','COULD','SHOULD','ABOUT','WHICH','THEIR',
+    'DORA','DEAR','WISH','COME','SOON','HOPE','LOVE','YOURS','YOUR','EVER',
+    'FOND','MISS','MUSIC','SING','SONG','WALTZ','BELLA','ALICE',
+    'THIS','THAT','WITH','HAVE','HERE','WHEN','THEN','THEM','EACH','MUCH',
+    'SEND','TELL','MINE','THAN','THERE','WHERE',
+    'THE','AND','FOR','ARE','BUT','NOT','YOU','HER','HIS','MAY','SEE','WHO',
+    'DID','SAY','SHE','HIM','HOW','ONE','OUR','OUT','HAS','HAD','NEW','NOW',
+    'OLD','WAY','ALL','WAS','USE','GET','LET',
+    'HE','AN','IN','IS','IT','OF','OR','TO','AT','BE','BY','DO','GO','IF',
+    'ME','MY','NO','ON','SO','UP','WE'];
+
+  // Sort by length descending
+  words.sort((a,b) => b.length - a.length);
+
+  let result = text;
+  const marked = new Array(text.length).fill(false);
+
+  for (const word of words) {
+    let idx = result.indexOf(word);
+    while (idx >= 0) {
+      let overlap = false;
+      for (let k = idx; k < idx + word.length; k++) {
+        if (marked[k]) { overlap = true; break; }
+      }
+      if (!overlap) {
+        for (let k = idx; k < idx + word.length; k++) marked[k] = true;
+      }
+      idx = result.indexOf(word, idx + 1);
+    }
+  }
+
+  // Build highlighted string
+  let html = '';
+  let inHighlight = false;
+  for (let i = 0; i < text.length; i++) {
+    if (marked[i] && !inHighlight) {
+      html += '<span class="highlight">';
+      inHighlight = true;
+    } else if (!marked[i] && inHighlight) {
+      html += '</span>';
+      inHighlight = false;
+    }
+    html += text[i];
+  }
+  if (inHighlight) html += '</span>';
+
+  return html;
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  if (e.code === 'Escape') stopPlayback();
+  if (e.code === 'ArrowUp') {
+    bpm = Math.min(140, bpm + 4);
+    document.getElementById('tempoSlider').value = bpm;
+    updateTempo();
+  }
+  if (e.code === 'ArrowDown') {
+    bpm = Math.max(40, bpm - 4);
+    document.getElementById('tempoSlider').value = bpm;
+    updateTempo();
+  }
+  if (e.key === 'r' || e.key === 'R') toggleReverse();
+  if (e.key === '1') toggleVoice('melody');
+  if (e.key === '2') toggleVoice('harmony');
+  if (e.key === '3') toggleVoice('bass');
+});
+
+// Init
+buildScore();
+</script>
+</body>
+</html>
