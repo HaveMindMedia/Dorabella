@@ -16,57 +16,100 @@ The cipher is **polyphonic**: it simultaneously encodes a written message and a 
 
 > *"Dora, the music is for thee."*
 
-The musical layer is a waltz in G major, 3/4 time — recoverable directly from the cipher symbols using a decomposition rule Elgar built into the encoding. The waltz is complete and playable. You can listen to it right now.
+The musical layer is a waltz in G major, 3/4 time — recoverable directly from the cipher symbols using a deterministic decomposition rule Elgar built into the encoding. The waltz is complete and playable.
+
+---
+
+## The Two Pillars
+
+**1. The mathematics is deterministic.**
+The cipher's 24-symbol alphabet is the Cartesian product of 8 diatonic scale degrees × 3 rhythmic durations. Apply `pitch = value ÷ 3` and `duration = value mod 3` to every symbol — the waltz falls out mechanically. No interpretation, no parameter fitting, no cherry-picking. The music is not inferred from the cipher. It *is* the cipher.
+
+**2. The music is undeniably Elgarian.**
+G major, 3/4 time — the same key and time signature as *Variation X (Dorabella)* from the *Enigma Variations*, composed for Dora two years later. Thirteen runs of repeated notes mirror Elgar's use of his lucky number and Dora's speech stammer. The pitch distribution centres on the relative-minor tonic (LA/E4), producing Elgar's characteristic quality of yearning within a major framework. The waltz loops: bar 31 resolves to bar 1, G3→G3 — a music box cylinder, designed to play forever.
 
 ---
 
 ## The Key Finding
 
-The 24 distinct cipher symbols map to the Latin alphabet via a bijection anchored at the word **DORA** (positions 0–3). This single anchor unlocks two more:
+The 24 distinct cipher symbols map to the Latin alphabet via a bijection anchored at **DORA** (positions 0–3). This single anchor unlocks two more:
 
 | Word | Positions | Significance |
 |------|-----------|--------------|
 | **DORA** | 0–3 | Recipient's name, at the cipher's opening |
-| **MUSIC** | 43–47 | Elgar's art |
-| **THEE** | 53–56 | Intimate address |
+| **MUSIC** | 43–47 | The cipher's structural centre |
+| **THEE** | 53–56 | Intimate address, opening the final section |
 
-The probability of these three words co-occurring at these positions by chance: **p = 1.66 × 10⁻¹⁴**.
+Combined probability of these three words at these positions by chance: **p = 1.66 × 10⁻¹⁴** (7.7σ).
 
-The musical layer uses: `pitch = symbol_value ÷ 3`, `duration = symbol_value mod 3`, yielding a diatonic melody, 3/4 time, G major. The 87 symbols produce a 31-bar waltz that loops (bar 31 → bar 1), consistent with a music box cylinder.
-
-Three anomalous dot markers on the original cipher card encode pitches A3, C4, E4 — the note-name initials **A**lice, **C**arice, **E**dward: Elgar's own signature, the same encoding used in *Craeg Lea* (1899).
+Three anomalous dot markers encode pitches A3, C4, E4 — an A minor triad. Note-name initials: **A**lice, **C**arice, **E**dward. Elgar's signature, in the same three-name encoding used in *Craeg Lea* (1899).
 
 ---
 
 ## Listen
 
-- [`dorabella_waltz_87bpm_v1.0_03-16-2026.wav`](dorabella_waltz_87bpm_v1.0_03-16-2026.wav) — music box tempo
-- [`dorabella_waltz_108bpm_v1.0_03-16-2026.wav`](dorabella_waltz_108bpm_v1.0_03-16-2026.wav) — performance waltz tempo
-- [`dorabella_waltz_player_v2.0_03-10-2026.html`](dorabella_waltz_player_v2.0_03-10-2026.html) — interactive browser player
+- [`audio/wav/dorabella_waltz_87bpm_v1.0_03-16-2026.wav`](audio/wav/dorabella_waltz_87bpm_v1.0_03-16-2026.wav) — music box tempo
+- [`audio/wav/dorabella_waltz_108bpm_v1.0_03-16-2026.wav`](audio/wav/dorabella_waltz_108bpm_v1.0_03-16-2026.wav) — performance waltz tempo
+- [`players/dorabella_waltz_player_v2.0_03-10-2026.html`](players/dorabella_waltz_player_v2.0_03-10-2026.html) — interactive browser player (score-synced)
 
 ---
 
-## Repository Contents
+## Repository Structure
 
-| File | Description |
-|------|-------------|
-| [`DORABELLA_CIPHER_SOLVED_v1.0_03-14-2026.html`](DORABELLA_CIPHER_SOLVED_v1.0_03-14-2026.html) | Full whitepaper — open in any browser |
-| [`dorabella_validation_v1.0_03-16-2026.py`](dorabella_validation_v1.0_03-16-2026.py) | **14 formal hypothesis tests** · run to verify all claims |
-| [`dorabella_polyphonic_v1.0_03-16-2026.py`](dorabella_polyphonic_v1.0_03-16-2026.py) | Polyphonic decoding + waltz reconstruction |
-| [`dorabella_complete_v3.0_03-14-2026.py`](dorabella_complete_v3.0_03-14-2026.py) | Full cipher analysis pipeline |
-| [`dorabella_adversarial_v1.0_03-14-2026.py`](dorabella_adversarial_v1.0_03-14-2026.py) | Adversarial/stress-test suite |
-| [`dorabella_waltz_87bpm_v1.0_03-16-2026.wav`](dorabella_waltz_87bpm_v1.0_03-16-2026.wav) | Decoded waltz — 87 BPM |
-| [`dorabella_waltz_108bpm_v1.0_03-16-2026.wav`](dorabella_waltz_108bpm_v1.0_03-16-2026.wav) | Decoded waltz — 108 BPM |
-| [`dorabella_waltz_polyphonic_87bpm_v1.0_03-16-2026.mid`](dorabella_waltz_polyphonic_87bpm_v1.0_03-16-2026.mid) | MIDI — polyphonic, 87 BPM |
-| [`dorabella_waltz_polyphonic_108bpm_v1.0_03-16-2026.mid`](dorabella_waltz_polyphonic_108bpm_v1.0_03-16-2026.mid) | MIDI — polyphonic, 108 BPM |
-| [`dorabella_waltz_v1.0_03-16-2026.pdf`](dorabella_waltz_v1.0_03-16-2026.pdf) | Sheet music (PDF) |
-| [`dorabella_waltz_v1.0_03-16-2026.ly`](dorabella_waltz_v1.0_03-16-2026.ly) | LilyPond source |
-| [`dorabella_waltz_v1.0_03-16-2026.abc`](dorabella_waltz_v1.0_03-16-2026.abc) | ABC notation |
-| [`dorabella_waltz_player_v2.0_03-10-2026.html`](dorabella_waltz_player_v2.0_03-10-2026.html) | Interactive browser player |
-| [`dorabella_polyphonic_player_v2.0_03-10-2026.html`](dorabella_polyphonic_player_v2.0_03-10-2026.html) | Polyphonic browser player |
-| [`SUBMISSION_README.md`](SUBMISSION_README.md) | Reviewer quickstart |
-| [`submission_cover_letter_v1.0.md`](submission_cover_letter_v1.0.md) | Journal/conference cover letter |
-| [`youtube_script_v1.0.md`](youtube_script_v1.0.md) | YouTube video script |
+```
+Dorabella/
+│
+├── README.md                          ← You are here
+│
+├── whitepaper/
+│   ├── DORABELLA_CIPHER_SOLVED_v1.0_03-14-2026.html   ← Open in any browser
+│   └── DORABELLA_CIPHER_SOLVED_v1.0_03-14-2026.pdf
+│
+├── scripts/
+│   ├── dorabella_validation_v1.0_03-16-2026.py        ← PRIMARY: 14 hypothesis tests
+│   ├── dorabella_polyphonic_v1.0_03-16-2026.py        ← Waltz reconstruction
+│   ├── dorabella_complete_v3.0_03-14-2026.py          ← Full analysis pipeline
+│   ├── dorabella_crack_final_v3.0_03-14-2026.py       ← Decryption logic
+│   └── dorabella_adversarial_v1.0_03-14-2026.py       ← Stress tests
+│
+├── audio/
+│   ├── wav/
+│   │   ├── dorabella_waltz_87bpm_v1.0_03-16-2026.wav
+│   │   └── dorabella_waltz_108bpm_v1.0_03-16-2026.wav
+│   └── midi/
+│       ├── dorabella_waltz_polyphonic_87bpm_v1.0_03-16-2026.mid
+│       ├── dorabella_waltz_polyphonic_108bpm_v1.0_03-16-2026.mid
+│       ├── dorabella_waltz_31bar_v1.0_03-16-2026.mid
+│       └── dorabella_waltz_v1.0_03-16-2026.midi
+│
+├── score/
+│   ├── pdf/
+│   │   ├── dorabella_waltz_print_v1.0_03-17-2026.pdf  ← Clean print score
+│   │   └── dorabella_waltz_v1.0_03-16-2026.pdf
+│   └── source/
+│       ├── dorabella_waltz_v1.0_03-16-2026.ly         ← LilyPond source
+│       ├── dorabella_waltz_print_v1.0_03-17-2026.ly
+│       └── dorabella_waltz_v1.0_03-16-2026.abc        ← ABC notation
+│
+├── players/
+│   ├── dorabella_waltz_player_v2.0_03-10-2026.html    ← Score-synced player
+│   ├── dorabella_polyphonic_player_v2.0_03-10-2026.html
+│   ├── dorabella_songform_player_v2.0_03-10-2026.html
+│   └── dorabella_waltz_v3.0_03-14-2026.html
+│
+├── submissions/
+│   ├── SUBMISSION_README.md                           ← Reviewer quickstart
+│   ├── cryptologia/
+│   │   └── submission_cover_letter_v1.0.md
+│   ├── histocrypt/
+│   │   └── histocrypt_2026_abstract_v1.0.md
+│   └── elgar-society/
+│       └── elgar_society_email_v1.0.md
+│
+└── youtube/
+    ├── youtube_script_v1.0.md                        ← Full 18-20 min script
+    └── youtube_metadata_v1.0.md                      ← Title, description, tags, thumbnail
+```
 
 ---
 
@@ -74,10 +117,10 @@ Three anomalous dot markers on the original cipher card encode pitches A3, C4, E
 
 ```bash
 pip install numpy scipy
-python3 dorabella_validation_v1.0_03-16-2026.py
+python3 scripts/dorabella_validation_v1.0_03-16-2026.py
 ```
 
-Runs 14 formal hypothesis tests with Bonferroni correction. Runtime ~90 seconds. All 14 should pass at α = 0.001.
+14 formal hypothesis tests with Bonferroni correction. Runtime ~90 seconds. All 14 pass at α = 0.001. Combined anchor probability: **p = 1.66 × 10⁻¹⁴**.
 
 ---
 
@@ -89,35 +132,31 @@ Runs 14 formal hypothesis tests with Bonferroni correction. Runtime ~90 seconds.
 | Null distribution (10,000 random bijections) | 0 / 10,000 match |
 | Bonferroni-corrected threshold (14 tests) | p < 4.5 × 10⁻³ |
 | Tests passing after correction | **14 / 14** |
+| Sigma level | **7.7σ** |
 
 ---
 
-## Prior Work
+## Prior Work Addressed
 
-This solution directly addresses:
-
-- **Schmeh (2018)** — survey of the Dorabella Cipher presented at HistoCrypt, cataloguing 12 prior failed attempts
-- **Wase (2023)** — *Cryptologia*, demonstrating that monoalphabetic substitution solvers (98.7% success on comparable ciphers) fail entirely on Dorabella — correctly suggesting a non-standard encoding
+- **Schmeh (2018)** — HistoCrypt survey of 12 prior failed attempts
+- **Wase (2023)** — *Cryptologia*: monoalphabetic solvers (98.7% success on comparable ciphers) fail entirely on Dorabella — correctly suggesting a non-standard encoding
 
 The polyphonic framework explains the Wase null result: monoalphabetic solvers fail because the cipher is not monoalphabetic. It is dual-channel.
 
 ---
 
-## Context
+## Publication Status
 
-Elgar was known for layered concealment:
-- *Enigma Variations* — musical cipher, identity of the "Enigma" theme still debated
-- *Craeg Lea* — anagram of Alice, Carice, Edward (A, C, E)
-- The Dorabella Cipher — now decoded
+| Venue | Status |
+|-------|--------|
+| *Cryptologia* (Taylor & Francis) | Submission in preparation |
+| HistoCrypt 2026 (Amiens, June 22–24) | Abstract prepared |
+| The Elgar Society | Correspondence in preparation |
 
 ---
 
 ## Author
 
-**Torqual Ravenskye** · Have Mind Media
+**Torqual Ravenskye** · Have Mind Media · March 2026
 
-*March 2026*
-
----
-
-*The decryption methodology is proprietary. All statistical results are independently reproducible from the appendix data and provided scripts.*
+*The decryption methodology is proprietary. All statistical results are independently reproducible from the whitepaper appendix and the scripts in this repository.*
