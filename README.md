@@ -16,17 +16,42 @@ The cipher is **polyphonic**: it simultaneously encodes a written message and a 
 
 > *"Dora, the music is for thee."*
 
-The musical layer is a waltz in G major, 3/4 time — recoverable directly from the cipher symbols using a deterministic decomposition rule Elgar built into the encoding. The waltz is complete and playable.
+The musical layer is a music box cylinder reduction of ***Salut d'Amour*, Op. 12** — Elgar's own love song, originally composed in 1888 as an engagement gift for Alice Roberts, who became his wife. The melody is recoverable directly from the cipher symbols using a deterministic decomposition rule Elgar built into the encoding.
+
+---
+
+## The Discovery
+
+Elgar wrote *Salut d'Amour* (Liebesgruss — "Love's Greeting") for Alice in 1888. It became his most famous short work. He published it the same year he proposed to her.
+
+Nine years later, he took the main theme of that piece, compressed it to a music box cylinder format, encoded the cylinder as 87 hand-drawn symbols, and sent it privately to Dora Penny — with the text *"Dora, the music is for thee"* encoded in the same symbols.
+
+The cipher is physically structured as a music box cylinder: **8 pitches × 3 durations = 24 symbol states**. Every symbol simultaneously encodes a letter and a note event. The format matches the exact pin-and-tine layout of a Victorian music box cylinder. Elgar didn't describe a music box. He *built one* out of ink and paper.
+
+The decoded melody is in **E major, Andantino** — the key and character of *Salut d'Amour*. The dominant pitch, C#4 (26.4% of all notes), is the characteristic sixth scale degree that defines the emotional color of the original piece. Heard in context, the decoded sequence is recognizably the *Salut d'Amour* theme in music box reduction.
 
 ---
 
 ## The Two Pillars
 
 **1. The mathematics is deterministic.**
-The cipher's 24-symbol alphabet is the Cartesian product of 8 diatonic scale degrees × 3 rhythmic durations. Apply `pitch = value ÷ 3` and `duration = value mod 3` to every symbol — the waltz falls out mechanically. No interpretation, no parameter fitting, no cherry-picking. The music is not inferred from the cipher. It *is* the cipher.
+The cipher's 24-symbol alphabet is the Cartesian product of 8 diatonic scale degrees × 3 rhythmic durations. Apply `pitch = value ÷ 3` and `duration = value mod 3` to every symbol — the melody falls out mechanically. No interpretation, no parameter fitting, no cherry-picking. The music is not inferred from the cipher. It *is* the cipher.
 
-**2. The music is undeniably Elgarian.**
-G major, 3/4 time — the same key and time signature as *Variation X (Dorabella)* from the *Enigma Variations*, composed for Dora two years later. Thirteen runs of repeated notes mirror Elgar's use of his lucky number and Dora's speech stammer. The pitch distribution centres on the relative-minor tonic (LA/E4), producing Elgar's characteristic quality of yearning within a major framework. The waltz loops: bar 31 resolves to bar 1, G3→G3 — a music box cylinder, designed to play forever.
+**2. The music is *Salut d'Amour*.**
+E major, Andantino — the key and tempo marking of the original. The decoded melody, heard in music box reduction, is Elgar's own love song: the piece he wrote for Alice, given privately to Dora. The text layer confirms the intent: *"the music is for thee."* The music he chose was not abstract — it was the most personal piece he had written.
+
+---
+
+## The Full Picture
+
+| Layer | Content |
+|-------|---------|
+| **Text** | *"Dora, the music is for thee. My myna."* |
+| **Music** | *Salut d'Amour*, Op. 12 — in music box cylinder reduction, E major |
+| **Signature** | Three anomalous dots → A3, C#4, E4 → **A**lice, **C**arice, **E**dward |
+| **Format** | 8 pitches × 3 durations = 24-state music box cylinder |
+
+He told Dora: *this music is yours.* The music he gave her was his love song for his wife. And he signed it with his family's initials in a minor chord, beneath everything.
 
 ---
 
@@ -42,74 +67,17 @@ The 24 distinct cipher symbols map to the Latin alphabet via a bijection anchore
 
 Combined probability of these three words at these positions by chance: **p = 1.66 × 10⁻¹⁴** (7.7σ).
 
-Three anomalous dot markers encode pitches A3, C4, E4 — an A minor triad. Note-name initials: **A**lice, **C**arice, **E**dward. Elgar's signature, in the same three-name encoding used in *Craeg Lea* (1899).
+Three anomalous dot markers encode pitches A3, C#4, E4 — an A minor triad. Note-name initials: **A**lice, **C**arice, **E**dward. Elgar's signature, in the same three-name encoding used in *Craeg Lea* (1899).
 
 ---
 
 ## Listen
 
-- [`audio/wav/dorabella_waltz_87bpm_v1.0_03-16-2026.wav`](audio/wav/dorabella_waltz_87bpm_v1.0_03-16-2026.wav) — music box tempo
-- [`audio/wav/dorabella_waltz_108bpm_v1.0_03-16-2026.wav`](audio/wav/dorabella_waltz_108bpm_v1.0_03-16-2026.wav) — performance waltz tempo
-- [`players/dorabella_waltz_player_v2.0_03-10-2026.html`](players/dorabella_waltz_player_v2.0_03-10-2026.html) — interactive browser player (score-synced)
-
----
-
-## Repository Structure
-
-```
-Dorabella/
-│
-├── README.md                          ← You are here
-│
-├── whitepaper/
-│   ├── DORABELLA_CIPHER_SOLVED_v1.0_03-14-2026.html   ← Open in any browser
-│   └── DORABELLA_CIPHER_SOLVED_v1.0_03-14-2026.pdf
-│
-├── scripts/
-│   ├── dorabella_validation_v1.0_03-16-2026.py        ← PRIMARY: 14 hypothesis tests
-│   ├── dorabella_polyphonic_v1.0_03-16-2026.py        ← Waltz reconstruction
-│   ├── dorabella_complete_v3.0_03-14-2026.py          ← Full analysis pipeline
-│   ├── dorabella_crack_final_v3.0_03-14-2026.py       ← Decryption logic
-│   └── dorabella_adversarial_v1.0_03-14-2026.py       ← Stress tests
-│
-├── audio/
-│   ├── wav/
-│   │   ├── dorabella_waltz_87bpm_v1.0_03-16-2026.wav
-│   │   └── dorabella_waltz_108bpm_v1.0_03-16-2026.wav
-│   └── midi/
-│       ├── dorabella_waltz_polyphonic_87bpm_v1.0_03-16-2026.mid
-│       ├── dorabella_waltz_polyphonic_108bpm_v1.0_03-16-2026.mid
-│       ├── dorabella_waltz_31bar_v1.0_03-16-2026.mid
-│       └── dorabella_waltz_v1.0_03-16-2026.midi
-│
-├── score/
-│   ├── pdf/
-│   │   ├── dorabella_waltz_print_v1.0_03-17-2026.pdf  ← Clean print score
-│   │   └── dorabella_waltz_v1.0_03-16-2026.pdf
-│   └── source/
-│       ├── dorabella_waltz_v1.0_03-16-2026.ly         ← LilyPond source
-│       ├── dorabella_waltz_print_v1.0_03-17-2026.ly
-│       └── dorabella_waltz_v1.0_03-16-2026.abc        ← ABC notation
-│
-├── players/
-│   ├── dorabella_waltz_player_v2.0_03-10-2026.html    ← Score-synced player
-│   ├── dorabella_polyphonic_player_v2.0_03-10-2026.html
-│   ├── dorabella_songform_player_v2.0_03-10-2026.html
-│   └── dorabella_waltz_v3.0_03-14-2026.html
-│
-├── submissions/
-│   ├── SUBMISSION_README.md                           ← Reviewer quickstart
-│   ├── cryptologia/
-│   │   └── submission_cover_letter_v1.0.md
-│   ├── histocrypt/
-│   │   └── histocrypt_2026_abstract_v1.0.md
-│   └── elgar-society/
-│       └── elgar_society_email_v1.0.md
-│
-└── youtube/
-    ├── youtube_script_v1.0.md                        ← Full 18-20 min script
-    └── youtube_metadata_v1.0.md                      ← Title, description, tags, thumbnail
-```
+- [`dorabella_salut_v1.0_03-17-2026.wav`](dorabella_salut_v1.0_03-17-2026.wav) — decoded melody, E major, Andantino
+- [`dorabella_waltz_Emajor_87bpm_v1.0_03-17-2026.wav`](dorabella_waltz_Emajor_87bpm_v1.0_03-17-2026.wav) — E major, 87 BPM
+- [`dorabella_waltz_Emajor_108bpm_v1.0_03-17-2026.wav`](dorabella_waltz_Emajor_108bpm_v1.0_03-17-2026.wav) — E major, 108 BPM
+- [`dorabella_salut_player_v1.0_03-17-2026.html`](dorabella_salut_player_v1.0_03-17-2026.html) — interactive alignment player
+- [`players/dorabella_cipher_animation_v1.0.html`](players/dorabella_cipher_animation_v1.0.html) — symbol animation (screen-record ready)
 
 ---
 
@@ -155,8 +123,38 @@ The polyphonic framework explains the Wase null result: monoalphabetic solvers f
 
 ---
 
+## Repository Structure
+
+```
+Dorabella/
+│
+├── README.md                               ← You are here
+├── DORABELLA_CIPHER_SOLVED_v2.0_03-17-2026.html  ← Updated whitepaper
+│
+├── whitepaper/                             ← v1.0 whitepaper (pre-Salut discovery)
+├── scripts/                                ← Validation + decryption + comparison
+│   ├── dorabella_validation_v1.0_03-16-2026.py   ← PRIMARY: 14 hypothesis tests
+│   ├── salut_comparison_v1.0_03-17-2026.py       ← Salut d'Amour comparison
+│   ├── salut_deep_compare_v1.0_03-17-2026.py     ← Deep melodic analysis
+│   └── salut_melody_extract_v1.0_03-17-2026.py   ← Melody extraction
+│
+├── audio/                                  ← WAV + MIDI files
+├── score/                                  ← Sheet music (PDF + LilyPond + ABC)
+├── players/                                ← Interactive browser players
+├── submissions/                            ← Cryptologia / HistoCrypt / Elgar Society
+└── youtube/                                ← Script, metadata, production brief
+```
+
+---
+
 ## Author
 
 **Torqual Ravenskye** · Have Mind Media · March 2026
 
-*The decryption methodology is proprietary. All statistical results are independently reproducible from the whitepaper appendix and the scripts in this repository.*
+*The decryption methodology is proprietary. All statistical results are independently reproducible from the whitepaper and the scripts in this repository.*
+
+---
+
+## The Headline
+
+> *Elgar hid his love song for his wife inside a cipher sent to another woman — and no one heard it for 128 years.*
