@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dorabella — Music Box Cylinder</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  background: #0e0c14; color: #d8d0c0;
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 24px 16px;
+}
+
+.hdr { text-align:center; margin-bottom:16px; max-width:700px; }
+.hdr .ded { font-size:14px; font-style:italic; color:#6a5a4a; }
+.hdr h1 { font-size:32px; letter-spacing:6px; font-weight:300; color:#c4a35a; }
+.hdr .sub { font-size:15px; font-style:italic; color:#8a7a5a; margin-top:2px; }
+.hdr .by { font-size:13px; margin-top:6px; color:#666; letter-spacing:1px; }
+.hdr .msg { font-size:14px; color:#b8956a; margin-top:6px; font-style:italic; }
+
+.ctl {
+  display:flex; gap:8px; align-items:center; margin:8px 0;
+  flex-wrap:wrap; justify-content:center;
+}
+.bt {
+  font-family:'Cormorant Garamond',serif; font-size:13px;
+  padding:5px 14px; background:#1e1a28; color:#c4a35a;
+  border:1px solid #3a3248; cursor:pointer; border-radius:2px;
+}
+.bt:hover { background:#2e2a38; }
+.bt.on { background:#3a3248; border-color:#c4a35a; }
+.sep { width:1px; height:18px; background:#333; }
+.tc { display:flex; align-items:center; gap:4px; font-size:12px; color:#8a7a5a; }
+.tc input { width:80px; accent-color:#c4a35a; }
+.vg { display:flex; align-items:center; gap:3px; font-size:10px; color:#666; }
+.vg label { min-width:34px; text-align:right; }
+.vg input { width:50px; accent-color:#c4a35a; }
+
+.inf { text-align:center; margin:6px 0 12px; }
+.inf .np { font-size:18px; font-weight:300; color:#c4a35a; min-height:24px; }
+.inf .si { font-size:12px; color:#666; margin-top:2px; min-height:16px; }
+.inf .dt {
+  font-size:14px; color:#8a7a5a; margin-top:3px;
+  font-family:'Courier New',monospace; letter-spacing:2px; min-height:20px;
+}
+.inf .dt .an { color:#c4a35a; font-weight:bold; }
+
+/* Cylinder visualization */
+.cyl-wrap {
+  width:100%; max-width:920px;
+  background:#12101a; border:1px solid #2a2838; border-radius:6px;
+  overflow:hidden; position:relative;
+}
+.cyl-header {
+  display:flex; justify-content:space-between; padding:4px 10px;
+  background:#181624; border-bottom:1px solid #2a2838; font-size:10px; color:#555;
+}
+.cyl-scroll { position:relative; overflow-x:auto; overflow-y:hidden; height:300px; }
+
+/* Phrase view */
+.phrase-wrap {
+  width:100%; max-width:920px; margin-top:12px;
+}
+.phrase-row {
+  display:flex; flex-wrap:wrap; gap:3px 1px;
+  padding:6px 0; border-bottom:1px solid #1e1c28;
+}
+.phrase-row:last-child { border:none; }
+.pin {
+  display:flex; flex-direction:column; align-items:center;
+  cursor:pointer; transition:transform 0.08s;
+}
+.pin:hover { transform:scale(1.08); }
+.pin.pl .pd { background:#c4a35a; color:#0e0c14; box-shadow:0 0 8px rgba(196,163,90,0.5); }
+.pd {
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-family:'Courier New',monospace; font-weight:600;
+  transition:all 0.12s;
+}
+.pd.h { width:28px; height:28px; font-size:9px; background:transparent; border:2px solid #c4a35a; color:#c4a35a; }
+.pd.q { width:24px; height:24px; font-size:8px; background:#c4a35a; color:#0e0c14; }
+.pd.e { width:18px; height:18px; font-size:7px; background:#8a7a5a; color:#0e0c14; }
+.pl2 { font-size:9px; margin-top:1px; color:#555; font-weight:600; }
+.pl2.an { color:#c4a35a; }
+.ptm { font-size:7px; color:#333; margin-top:0; }
+
+/* Section dividers */
+.sec-div {
+  display:inline-flex; align-items:center; padding:0 6px;
+  font-size:10px; color:#3a3248; font-style:italic;
+  border-left:2px solid #3a3248; margin:0 4px;
+  align-self:stretch;
+}
+
+/* Stats */
+.stats {
+  width:100%; max-width:920px; margin-top:16px;
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:8px;
+}
+.stat-card {
+  background:#151320; border:1px solid #2a2838; border-radius:4px;
+  padding:10px 12px; font-size:12px;
+}
+.stat-card h4 { color:#c4a35a; font-size:11px; letter-spacing:1px; margin-bottom:6px; }
+.stat-card .sv { color:#8a7a5a; line-height:1.6; }
+.stat-card .sv b { color:#d8d0c0; }
+
+.foot {
+  margin-top:18px; text-align:center; font-size:11px; color:#444;
+  font-style:italic; line-height:1.6;
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="ded">à Miss Penny</div>
+  <h1>DORABELLA</h1>
+  <div class="sub">Music Box Cylinder &middot; Variation on Salut d'Amour</div>
+  <div class="by"><b>Edward Elgar</b> &middot; 1897 &middot; Decoded by Torqual Ravenskye, 2026</div>
+  <div class="msg">"Dora, the music is for thee."</div>
+</div>
+
+<div class="ctl">
+  <button class="bt" id="playBtn" onclick="togglePlay()">&#9654; Play</button>
+  <button class="bt" onclick="stop()">&#9632;</button>
+  <button class="bt" onclick="restart()">&#8634;</button>
+  <button class="bt" id="loopBtn" onclick="toggleLoop()">&#8635; Loop</button>
+  <div class="sep"></div>
+  <div class="tc">
+    <span>&#9833;=</span>
+    <input type="range" id="tS" min="40" max="120" value="72" oninput="setT(this.value)">
+    <span id="tV">72</span>
+  </div>
+  <div class="sep"></div>
+  <div class="vg"><label>Mel</label><input type="range" id="vM" min="0" max="100" value="85"></div>
+  <div class="vg"><label>Bass</label><input type="range" id="vB" min="0" max="100" value="45"></div>
+  <div class="vg"><label>Harm</label><input type="range" id="vH" min="0" max="100" value="30"></div>
+</div>
+
+<div class="inf">
+  <div class="np" id="np">E Major &middot; Music Box Cylinder &middot; 87 pins</div>
+  <div class="si" id="si">&mdash;</div>
+  <div class="dt" id="dt">&mdash;</div>
+</div>
+
+<div class="cyl-wrap">
+  <div class="cyl-header">
+    <span>Cylinder — 87 pins &middot; 8 tines &middot; 103.5 beats</span>
+    <span id="cylInfo">E3 F#3 G#3 A3 B3 C#4 D#4 E4</span>
+  </div>
+  <div class="cyl-scroll" id="cylScroll">
+    <canvas id="cv"></canvas>
+  </div>
+</div>
+
+<div class="phrase-wrap" id="phraseWrap"></div>
+
+<div class="stats" id="statsPanel"></div>
+
+<div class="foot">
+  8 pitches &times; 3 durations = 24-symbol alphabet = music box pin layout<br>
+  87 pins &middot; 103.5 beats &middot; E major &middot; No imposed time signature<br>
+  Sections: S0 (24 pins, 27.5 beats) &middot; S1 (28 pins, 34 beats) &middot; S2 (35 pins, 42 beats)
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// RAW CIPHER DATA — Ground truth, no interpretation
+// ═══════════════════════════════════════════════════════════════
+const S0 = [1,14,4,2,0,7,18,2,9,22,5,16,15,3,16,8,16,16,7,14,14,16,3,21];
+const S1 = [22,21,6,5,17,18,16,18,7,21,2,9,10,2,4,16,16,4,7,6,15,18,16,5,16,7,19,17];
+const S2 = [15,3,21,9,9,21,5,17,4,17,7,19,17,4,3,19,20,6,17,4,16,7,19,15,17,6,2,14,6,17,7,2,3,21,2];
+const FLAT = [...S0, ...S1, ...S2];
+const N = 87;
+
+// Letter mapping
+const DM = {0:'L',1:'D',2:'A',3:'T',4:'R',5:'C',6:'M',7:'N',8:'F',9:'E',
+            10:'V',14:'O',15:'U',16:'I',17:'Y',18:'S',19:'B',20:'P',21:'H',22:'G'};
+const AM = {};
+[0,1,2,3].forEach(i => AM[i] = 'DORA');
+[43,44,45,46,47].forEach(i => AM[i] = 'MUSIC');
+[53,54,55,56].forEach(i => AM[i] = 'THEE');
+
+// ═══════════════════════════════════════════════════════════════
+// MUSIC BOX: 8 tines in E major
+// val // 3 = which tine (0-7)
+// val % 3  = pin type (duration)
+// ═══════════════════════════════════════════════════════════════
+const TINES = [52,54,56,57,59,61,63,64]; // E3 F#3 G#3 A3 B3 C#4 D#4 E4
+const TN = {52:'E3',54:'F#3',56:'G#3',57:'A3',59:'B3',61:'C#4',63:'D#4',64:'E4'};
+const TS = {52:'E',54:'F#',56:'G#',57:'A',59:'B',61:'C#',63:'D#',64:'E\u2074'};
+
+// Duration: pin length on cylinder
+// 0 = long pin (2 beats), 1 = medium pin (1 beat), 2 = short pin (0.5 beats)
+const DB = [2.0, 1.0, 0.5];
+const DL = ['long','med','short'];
+
+// ═══════════════════════════════════════════════════════════════
+// BUILD PIN DATA (no bars — absolute positions)
+// ═══════════════════════════════════════════════════════════════
+let beatPos = 0;
+const pins = FLAT.map((v, i) => {
+  const tine = Math.min(Math.floor(v / 3), 7);
+  const durIdx = v % 3;
+  const p = {
+    i, v,
+    midi: TINES[tine], tine,
+    name: TN[TINES[tine]], short: TS[TINES[tine]],
+    dur: DB[durIdx], durIdx, durLabel: DL[durIdx],
+    letter: DM[v] || '?',
+    isA: AM[i] !== undefined, aw: AM[i] || null,
+    sec: i < S0.length ? 0 : (i < S0.length + S1.length ? 1 : 2),
+    beat: beatPos,
+  };
+  beatPos += p.dur;
+  return p;
+});
+const totalBeats = beatPos; // 103.5
+
+// ═══════════════════════════════════════════════════════════════
+// NATURAL PHRASE DETECTION
+// Phrases break at: half notes (natural breath), section boundaries
+// ═══════════════════════════════════════════════════════════════
+const phrases = [];
+let curPhrase = [];
+
+pins.forEach((p, i) => {
+  curPhrase.push(p);
+  const nextSec = (i < N-1) && pins[i+1].sec !== p.sec;
+  const isLong = p.durIdx === 0; // half note = breath point
+  const nextIsLong = (i < N-1) && pins[i+1].durIdx === 0;
+
+  // Break AFTER a half note if next note starts a new gesture
+  // Or at section boundaries
+  if (nextSec || (isLong && curPhrase.length >= 2 && !nextIsLong)) {
+    phrases.push([...curPhrase]);
+    curPhrase = [];
+  }
+});
+if (curPhrase.length) phrases.push(curPhrase);
+
+// ═══════════════════════════════════════════════════════════════
+// HARMONY — derived from local pitch content (sliding window)
+// No bar structure — harmony follows the melody
+// ═══════════════════════════════════════════════════════════════
+const CPC = {
+  'E':[4,8,11], 'F#m':[6,9,1], 'G#m':[8,11,3],
+  'A':[9,1,4], 'B':[11,3,6], 'C#m':[1,4,8], 'B7':[11,3,6,9],
+};
+const CV = {
+  'E':  {bass:40, ch:[52,56,59]},
+  'F#m':{bass:42, ch:[54,57,61]},
+  'G#m':{bass:44, ch:[56,59,63]},
+  'A':  {bass:45, ch:[57,61,64]},
+  'B':  {bass:47, ch:[59,63]},
+  'C#m':{bass:49, ch:[52,61]},
+  'B7': {bass:47, ch:[57,63]},
+};
+
+function bestChord(midis) {
+  const pcs = new Set(midis.map(m => m%12));
+  let best='E', bs=-1;
+  for (const [nm,arr] of Object.entries(CPC)) {
+    let s=0; arr.forEach(pc => { if(pcs.has(pc)) s++; });
+    if (s>bs) { bs=s; best=nm; }
+  }
+  return best;
+}
+
+// Assign harmony per phrase
+const phraseChords = phrases.map((ph, pi) => {
+  const midis = ph.map(p => p.midi);
+  let ch = bestChord(midis);
+  if (pi === 0) ch = 'E';
+  if (pi === phrases.length-1) ch = 'E';
+  if (pi === phrases.length-2) ch = 'B7';
+  return ch;
+});
+
+// Build accompaniment from phrase chords
+const accomp = [];
+phrases.forEach((ph, pi) => {
+  const ch = phraseChords[pi];
+  const c = CV[ch];
+  const start = ph[0].beat;
+  const dur = ph.reduce((s,p) => s+p.dur, 0);
+
+  // Bass on phrase start
+  accomp.push({type:'bass', midi:c.bass, start, dur: Math.min(dur*0.4, 2)});
+
+  // Harmony voices at phrase midpoint
+  const mid = start + dur * 0.35;
+  const hDur = Math.min(dur * 0.35, 1.5);
+  c.ch.forEach(m => accomp.push({type:'harm', midi:m, start:mid, dur:hDur}));
+
+  // If phrase is long enough, second harmony hit
+  if (dur > 4) {
+    const mid2 = start + dur * 0.65;
+    c.ch.forEach(m => accomp.push({type:'harm', midi:m, start:mid2, dur:hDur*0.8}));
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// CYLINDER CANVAS — pin visualization
+// ═══════════════════════════════════════════════════════════════
+const cv = document.getElementById('cv');
+const cx = cv.getContext('2d');
+const cScroll = document.getElementById('cylScroll');
+
+const PH = 28; // pin height per tine
+const BW = 32; // pixels per beat
+const LM = 52;
+const NTINES = 8;
+
+function drawCylinder() {
+  const w = LM + totalBeats * BW + 30;
+  const h = NTINES * PH + 40;
+  cv.width = w; cv.height = h;
+
+  // Background — cylinder surface
+  const grad = cx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,'#181420');
+  grad.addColorStop(0.5,'#1e1a28');
+  grad.addColorStop(1,'#181420');
+  cx.fillStyle = grad; cx.fillRect(0,0,w,h);
+
+  // Tine lines + labels
+  for (let t = 0; t < NTINES; t++) {
+    const y = (NTINES-1-t) * PH + 20;
+    cx.strokeStyle = '#222030';
+    cx.beginPath(); cx.moveTo(LM,y); cx.lineTo(w,y); cx.stroke();
+
+    cx.fillStyle = '#4a4060'; cx.font = '9px monospace'; cx.textAlign = 'right';
+    cx.fillText(TN[TINES[t]], LM-4, y+3);
+  }
+
+  // Phrase boundaries (vertical)
+  phrases.forEach(ph => {
+    const x = LM + ph[0].beat * BW;
+    cx.strokeStyle = '#2a2840'; cx.lineWidth = 0.5;
+    cx.setLineDash([3,3]);
+    cx.beginPath(); cx.moveTo(x,10); cx.lineTo(x,h-10); cx.stroke();
+    cx.setLineDash([]);
+  });
+
+  // Section boundaries
+  [S0.length, S0.length+S1.length].forEach(si => {
+    const x = LM + pins[si].beat * BW;
+    cx.strokeStyle = '#4a3a5a'; cx.lineWidth = 1.5;
+    cx.beginPath(); cx.moveTo(x,5); cx.lineTo(x,h-5); cx.stroke();
+  });
+
+  // Accompaniment (behind)
+  accomp.forEach(a => {
+    const x = LM + a.start * BW;
+    const midi = a.midi;
+    // Map to closest tine row or below
+    let tIdx = TINES.indexOf(midi);
+    let y;
+    if (tIdx >= 0) {
+      y = (NTINES-1-tIdx)*PH+20;
+    } else {
+      // Bass notes below the tines
+      y = NTINES*PH+10 + (64-midi)*0.5;
+    }
+    const pw = a.dur * BW;
+    cx.fillStyle = a.type==='bass' ? 'rgba(80,130,80,0.3)' : 'rgba(90,80,140,0.2)';
+    cx.fillRect(x, y-PH/2+2, pw, PH-4);
+  });
+
+  // Pins
+  pins.forEach(p => {
+    const x = LM + p.beat * BW;
+    const y = (NTINES-1-p.tine)*PH+20;
+    const pw = p.dur * BW;
+
+    // Pin color by section
+    if (p.isA) {
+      cx.fillStyle = '#c4a35a';
+    } else {
+      cx.fillStyle = ['#a0885a','#7a9a5a','#5a80a0'][p.sec];
+    }
+
+    // Rounded pin
+    const r = 3;
+    cx.beginPath();
+    cx.moveTo(x+r, y-PH/2+3);
+    cx.lineTo(x+pw-r, y-PH/2+3);
+    cx.quadraticCurveTo(x+pw, y-PH/2+3, x+pw, y-PH/2+3+r);
+    cx.lineTo(x+pw, y+PH/2-3-r);
+    cx.quadraticCurveTo(x+pw, y+PH/2-3, x+pw-r, y+PH/2-3);
+    cx.lineTo(x+r, y+PH/2-3);
+    cx.quadraticCurveTo(x, y+PH/2-3, x, y+PH/2-3-r);
+    cx.lineTo(x, y-PH/2+3+r);
+    cx.quadraticCurveTo(x, y-PH/2+3, x+r, y-PH/2+3);
+    cx.fill();
+
+    // Letter
+    if (pw > 10) {
+      cx.fillStyle = '#0e0c14'; cx.font = 'bold 8px monospace'; cx.textAlign = 'center';
+      cx.fillText(p.letter, x+pw/2, y+3);
+    }
+  });
+}
+drawCylinder();
+
+// Playhead
+const phd = document.createElement('div');
+phd.style.cssText = 'position:absolute;top:0;bottom:0;width:2px;background:#c4a35a;z-index:10;display:none;pointer-events:none;box-shadow:0 0 6px rgba(196,163,90,0.6);';
+cScroll.appendChild(phd);
+
+// ═══════════════════════════════════════════════════════════════
+// PHRASE VIEW — natural grouping
+// ═══════════════════════════════════════════════════════════════
+const pw = document.getElementById('phraseWrap');
+let secLabels = ['Section I (S0)','Section II (S1)','Section III (S2)'];
+let lastSec = -1;
+
+phrases.forEach((ph, pi) => {
+  const sec = ph[0].sec;
+
+  // Section header
+  if (sec !== lastSec) {
+    const sh = document.createElement('div');
+    sh.style.cssText = 'color:#4a3a5a;font-size:12px;letter-spacing:2px;padding:8px 0 2px;border-top:1px solid #2a2838;margin-top:4px;';
+    sh.textContent = secLabels[sec] + ` — ${[S0,S1,S2][sec].length} pins, ${[27.5,34,42][sec]} beats`;
+    pw.appendChild(sh);
+    lastSec = sec;
+  }
+
+  const row = document.createElement('div');
+  row.className = 'phrase-row';
+  row.style.cssText += `padding-left:4px;`;
+
+  // Phrase info
+  const pBeats = ph.reduce((s,p)=>s+p.dur,0);
+  const pLabel = document.createElement('span');
+  pLabel.style.cssText = 'font-size:9px;color:#333;align-self:center;min-width:30px;text-align:right;padding-right:4px;';
+  pLabel.textContent = `${pBeats}b`;
+  row.appendChild(pLabel);
+
+  // Chord
+  const chLabel = document.createElement('span');
+  chLabel.style.cssText = 'font-size:9px;color:#3a5a3a;align-self:center;min-width:28px;padding-right:4px;';
+  chLabel.textContent = phraseChords[pi];
+  row.appendChild(chLabel);
+
+  ph.forEach(p => {
+    const pin = document.createElement('div');
+    pin.className = 'pin';
+    pin.id = `p${p.i}`;
+    pin.onclick = () => preview(p);
+    pin.style.width = `${Math.max(22, p.dur * 30)}px`;
+
+    const dot = document.createElement('div');
+    dot.className = `pd ${['h','q','e'][p.durIdx]}`;
+    dot.textContent = p.short;
+    pin.appendChild(dot);
+
+    const lt = document.createElement('div');
+    lt.className = `pl2 ${p.isA?'an':''}`;
+    lt.textContent = p.letter;
+    pin.appendChild(lt);
+
+    const tm = document.createElement('div');
+    tm.className = 'ptm';
+    tm.textContent = p.durLabel;
+    pin.appendChild(tm);
+
+    row.appendChild(pin);
+  });
+
+  pw.appendChild(row);
+});
+
+// ═══════════════════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════════════════
+function buildStats() {
+  const sp = document.getElementById('statsPanel');
+
+  // Duration distribution
+  const dCounts = [0,0,0];
+  pins.forEach(p => dCounts[p.durIdx]++);
+
+  // Pitch distribution
+  const pCounts = {};
+  pins.forEach(p => { pCounts[p.name] = (pCounts[p.name]||0)+1; });
+
+  // Intervals
+  const ints = [];
+  for (let i=0;i<N-1;i++) ints.push(pins[i+1].midi - pins[i].midi);
+  const step = ints.filter(x=>Math.abs(x)<=2).length;
+  const leaps = ints.filter(x=>Math.abs(x)>4).length;
+  const repeated = ints.filter(x=>x===0).length;
+
+  const cards = [
+    {
+      title: 'CYLINDER SPECS',
+      lines: [
+        `<b>87</b> pins, <b>8</b> tines, <b>24</b>-symbol alphabet`,
+        `<b>103.5</b> total beats`,
+        `Half: <b>${dCounts[0]}</b> (${(100*dCounts[0]/N).toFixed(0)}%) · Quarter: <b>${dCounts[1]}</b> (${(100*dCounts[1]/N).toFixed(0)}%) · Eighth: <b>${dCounts[2]}</b> (${(100*dCounts[2]/N).toFixed(0)}%)`,
+        `<b>${phrases.length}</b> natural phrases`,
+      ]
+    },
+    {
+      title: 'SECTIONS',
+      lines: [
+        `S0: <b>24</b> pins, <b>27.5</b> beats — DORA`,
+        `S1: <b>28</b> pins, <b>34.0</b> beats — MUSIC`,
+        `S2: <b>35</b> pins, <b>42.0</b> beats — THEE`,
+        `S1 fits <b>2/4</b> exactly (17 bars)`,
+        `S2 fits <b>2/4</b> (21) or <b>3/4</b> (14)`,
+      ]
+    },
+    {
+      title: 'PITCH',
+      lines: Object.entries(pCounts).sort((a,b)=>b[1]-a[1]).map(
+        ([n,c]) => `${n}: <b>${c}</b> (${(100*c/N).toFixed(0)}%)`
+      )
+    },
+    {
+      title: 'INTERVALS',
+      lines: [
+        `Stepwise (≤2 st): <b>${(100*step/ints.length).toFixed(0)}%</b>`,
+        `Repeated pitch: <b>${(100*repeated/ints.length).toFixed(0)}%</b>`,
+        `Leaps (>4 st): <b>${(100*leaps/ints.length).toFixed(0)}%</b>`,
+        `Mean |interval|: <b>${(ints.reduce((s,x)=>s+Math.abs(x),0)/ints.length).toFixed(1)}</b> st`,
+      ]
+    },
+  ];
+
+  sp.innerHTML = cards.map(c =>
+    `<div class="stat-card"><h4>${c.title}</h4><div class="sv">${c.lines.join('<br>')}</div></div>`
+  ).join('');
+}
+buildStats();
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIO — Music box tines
+// ═══════════════════════════════════════════════════════════════
+let actx=null, playing=false, srcs=[], af=null;
+let pst=0, psb=0, tempo=72, looping=false;
+
+function ac() { if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)(); return actx; }
+function fr(m) { return 440*Math.pow(2,(m-69)/12); }
+function b2s(b) { return b*60/tempo; }
+function gv(id) { return document.getElementById(id).value/100; }
+
+// Music box tine — bright metallic pluck with resonance
+function sTine(ctx, midi, t, dur, vol) {
+  const f = fr(midi);
+  const v = vol * 0.2;
+
+  const o1 = ctx.createOscillator(); o1.type='triangle'; o1.frequency.value=f;
+  const o2 = ctx.createOscillator(); o2.type='sine'; o2.frequency.value=f*2;
+  const o3 = ctx.createOscillator(); o3.type='sine'; o3.frequency.value=f*3;
+  const o5 = ctx.createOscillator(); o5.type='sine'; o5.frequency.value=f*5;
+
+  // Subtle vibrato (tine resonance)
+  const vib = ctx.createOscillator(); vib.frequency.value=4.5;
+  const vg = ctx.createGain(); vg.gain.value=1.2;
+  vib.connect(vg); vg.connect(o1.frequency);
+
+  const g1 = ctx.createGain();
+  const g2 = ctx.createGain();
+  const g3 = ctx.createGain();
+  const g5 = ctx.createGain();
+  o1.connect(g1); g1.connect(ctx.destination);
+  o2.connect(g2); g2.connect(ctx.destination);
+  o3.connect(g3); g3.connect(ctx.destination);
+  o5.connect(g5); g5.connect(ctx.destination);
+
+  // Music box attack: instant pluck, exponential decay
+  g1.gain.setValueAtTime(0,t);
+  g1.gain.linearRampToValueAtTime(v, t+0.008);
+  g1.gain.exponentialRampToValueAtTime(v*0.45, t+dur*0.25);
+  g1.gain.linearRampToValueAtTime(v*0.25, t+dur*0.7);
+  g1.gain.linearRampToValueAtTime(0.001, t+dur);
+
+  g2.gain.setValueAtTime(0,t);
+  g2.gain.linearRampToValueAtTime(v*0.28, t+0.005);
+  g2.gain.exponentialRampToValueAtTime(0.001, t+dur*0.45);
+
+  g3.gain.setValueAtTime(0,t);
+  g3.gain.linearRampToValueAtTime(v*0.14, t+0.003);
+  g3.gain.exponentialRampToValueAtTime(0.001, t+dur*0.3);
+
+  g5.gain.setValueAtTime(0,t);
+  g5.gain.linearRampToValueAtTime(v*0.07, t+0.002);
+  g5.gain.exponentialRampToValueAtTime(0.001, t+dur*0.18);
+
+  const e = t+dur+0.2;
+  [o1,o2,o3,o5,vib].forEach(o => { o.start(t); o.stop(e); srcs.push(o); });
+}
+
+function sBass(ctx, midi, t, dur, vol) {
+  const f = fr(midi); const v = vol*0.1;
+  const o = ctx.createOscillator(); o.type='sine'; o.frequency.value=f;
+  const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(v,t+0.015);
+  g.gain.exponentialRampToValueAtTime(v*0.2,t+dur*0.6);
+  g.gain.linearRampToValueAtTime(0.001,t+dur);
+  o.start(t); o.stop(t+dur+0.1); srcs.push(o);
+}
+
+function sHarm(ctx, midi, t, dur, vol) {
+  const f = fr(midi); const v = vol*0.06;
+  const o = ctx.createOscillator(); o.type='sine'; o.frequency.value=f;
+  const g = ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(v,t+0.008);
+  g.gain.exponentialRampToValueAtTime(v*0.12,t+dur*0.7);
+  g.gain.linearRampToValueAtTime(0.001,t+dur);
+  o.start(t); o.stop(t+dur+0.1); srcs.push(o);
+}
+
+function preview(p) {
+  sTine(ac(), p.midi, ac().currentTime, b2s(p.dur), gv('vM'));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PLAYBACK
+// ═══════════════════════════════════════════════════════════════
+function schedAll(from) {
+  const ctx=ac(), now=ctx.currentTime;
+  pst=now; psb=from;
+  const vm=gv('vM'), vb=gv('vB'), vh=gv('vH');
+
+  pins.forEach(p => {
+    if (p.beat >= from) sTine(ctx, p.midi, now+b2s(p.beat-from), b2s(p.dur), vm);
+  });
+  accomp.forEach(a => {
+    if (a.start >= from) {
+      const t=now+b2s(a.start-from), d=b2s(a.dur);
+      if (a.type==='bass') sBass(ctx,a.midi,t,d,vb);
+      else sHarm(ctx,a.midi,t,d,vh);
+    }
+  });
+}
+
+let _lh = -1;
+
+function anim() {
+  if (!playing) return;
+  const ctx=ac();
+  const el = ctx.currentTime - pst;
+  const cb = psb + (el*tempo)/60;
+
+  if (cb >= totalBeats) {
+    if (looping) { killSrc(); schedAll(0); _lh=-1; }
+    else { stop(); return; }
+  }
+
+  // Playhead
+  const x = LM + cb * BW;
+  phd.style.left = x+'px'; phd.style.display='block';
+  const ww = cScroll.clientWidth;
+  if (x > cScroll.scrollLeft + ww*0.6) cScroll.scrollLeft = x - ww*0.25;
+
+  // Current pin
+  let cur = -1;
+  for (let i=0;i<N;i++) {
+    if (pins[i].beat <= cb && pins[i].beat+pins[i].dur > cb) { cur=i; break; }
+  }
+  if (cur>=0 && cur!==_lh) { _lh=cur; hl(cur); }
+
+  af = requestAnimationFrame(anim);
+}
+
+function hl(idx) {
+  document.querySelectorAll('.pin.pl').forEach(e=>e.classList.remove('pl'));
+  const el = document.getElementById(`p${idx}`);
+  if (el) { el.classList.add('pl'); el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}); }
+  const p = pins[idx];
+  const sn = ['I','II','III'];
+
+  document.getElementById('np').textContent =
+    `${p.name} — ${p.durLabel}${p.isA?' — '+p.aw:''} — Section ${sn[p.sec]}`;
+  document.getElementById('si').textContent =
+    `Pin ${idx+1}/87 · Beat ${p.beat.toFixed(1)} · Phrase ${1+phrases.findIndex(ph=>ph.includes(p))}/${phrases.length}`;
+
+  const dtE = document.getElementById('dt');
+  const st = Math.max(0,idx-35);
+  let h='';
+  for (let i=st;i<=idx;i++) {
+    const lt=pins[i].letter;
+    h += pins[i].isA ? `<span class="an">${lt}</span>` : lt;
+  }
+  dtE.innerHTML = h;
+}
+
+function togglePlay() {
+  if (playing) {
+    killSrc(); playing=false;
+    if(af) cancelAnimationFrame(af);
+    phd.style.display='none';
+    document.getElementById('playBtn').textContent='▶ Play';
+  } else {
+    playing=true; _lh=-1;
+    document.getElementById('playBtn').textContent='⏸';
+    schedAll(0); anim();
+  }
+}
+
+function stop() {
+  killSrc(); playing=false;
+  if(af) cancelAnimationFrame(af);
+  phd.style.display='none'; _lh=-1;
+  document.querySelectorAll('.pin.pl').forEach(e=>e.classList.remove('pl'));
+  document.getElementById('playBtn').textContent='▶ Play';
+  document.getElementById('np').textContent='E Major · Music Box Cylinder · 87 pins';
+  document.getElementById('si').textContent='—';
+  document.getElementById('dt').textContent='—';
+}
+
+function restart() {
+  stop();
+  setTimeout(()=>{ playing=true; _lh=-1;
+    document.getElementById('playBtn').textContent='⏸';
+    schedAll(0); anim();
+  },80);
+}
+
+function toggleLoop() {
+  looping=!looping;
+  document.getElementById('loopBtn').classList.toggle('on',looping);
+}
+
+function killSrc() { srcs.forEach(s=>{try{s.stop();}catch(e){}}); srcs=[]; }
+
+function setT(v) {
+  tempo=parseInt(v);
+  document.getElementById('tV').textContent=v;
+  if (playing) {
+    const ctx=ac();
+    const el=ctx.currentTime-pst;
+    const cb=psb+(el*tempo)/60;
+    killSrc(); schedAll(Math.min(cb,totalBeats-0.5));
+  }
+}
+</script>
+</body>
+</html>

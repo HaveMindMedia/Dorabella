@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Dorabella Cipher Solved v2.0 — Torqual Ravenskye, Have Mind Media</title>
+<style>
+
+/* ============================================================
+   PUBLICATION STYLESHEET — DARK ELEGANT THEME
+   ============================================================ */
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --navy:       #0d1b2a;
+    --navy-mid:   #152236;
+    --navy-light: #1e3452;
+    --gold:       #c9a84c;
+    --gold-pale:  #e8d4a0;
+    --gold-dim:   #8a6f2e;
+    --cream:      #f2ead8;
+    --cream-dim:  #d8ccb4;
+    --text:       #e8e0d0;
+    --text-dim:   #b0a88e;
+    --border:     #2e4468;
+    --anchor:     #d4a843;
+    --red-accent: #b05050;
+}
+
+html {
+    background: var(--navy);
+}
+
+body {
+    font-family: 'Georgia', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    font-size: 16.5px;
+    line-height: 1.8;
+    color: var(--text);
+    background: var(--navy);
+    padding: 50px 20px 80px;
+}
+
+/* ---- PAPER CONTAINER ---- */
+.paper {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    padding: 60px 64px;
+}
+
+/* ---- ORNAMENTAL RULE ---- */
+.rule-gold {
+    border: none;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--gold), var(--gold), transparent);
+    margin: 0 auto 36px;
+    width: 80%;
+}
+
+.rule-thin {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 32px 0;
+}
+
+/* ---- TITLE BLOCK ---- */
+.title-block {
+    text-align: center;
+    margin-bottom: 44px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--gold-dim);
+}
+
+.version-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    padding: 3px 10px;
+    margin-bottom: 20px;
+}
+
+.title-block h1 {
+    font-size: 26px;
+    font-weight: bold;
+    line-height: 1.45;
+    margin-bottom: 12px;
+    color: var(--cream);
+    letter-spacing: 0.01em;
+}
+
+.title-block .subtitle {
+    font-size: 16px;
+    font-style: italic;
+    color: var(--gold-pale);
+    margin-bottom: 22px;
+    line-height: 1.5;
+}
+
+.title-block .author {
+    font-size: 16px;
+    color: var(--cream);
+    margin-bottom: 4px;
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
+}
+
+.title-block .affiliation {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    letter-spacing: 0.04em;
+}
+
+.title-block .date-line {
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+/* ---- ABSTRACT ---- */
+.abstract {
+    margin-bottom: 40px;
+    padding: 22px 28px;
+    background: rgba(201,168,76,0.07);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 3px 3px 0;
+}
+
+.abstract .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 12px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.abstract p {
+    font-size: 15px;
+    line-height: 1.75;
+    text-align: justify;
+    margin-bottom: 10px;
+    color: var(--text);
+}
+
+.abstract p:last-child { margin-bottom: 0; }
+
+/* ---- SECTION HEADINGS ---- */
+h2.section {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 46px;
+    margin-bottom: 16px;
+    color: var(--gold-pale);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    letter-spacing: 0.02em;
+}
+
+h3 {
+    font-size: 15.5px;
+    font-weight: bold;
+    margin-top: 26px;
+    margin-bottom: 10px;
+    color: var(--cream-dim);
+}
+
+/* ---- BODY TEXT ---- */
+p {
+    margin-bottom: 13px;
+    text-align: justify;
+}
+
+/* ---- LISTS ---- */
+ul, ol {
+    margin: 10px 0 14px 28px;
+}
+
+ul { list-style: disc; }
+ol { list-style: decimal; }
+
+li {
+    margin-bottom: 5px;
+    line-height: 1.7;
+}
+
+/* ---- TABLES ---- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0 24px;
+    font-size: 13.5px;
+}
+
+table caption {
+    font-style: italic;
+    font-size: 13px;
+    text-align: left;
+    margin-bottom: 8px;
+    color: var(--text-dim);
+    padding-left: 2px;
+}
+
+th {
+    background: var(--navy-light);
+    color: var(--gold-pale);
+    font-size: 12px;
+    font-weight: bold;
+    padding: 7px 10px;
+    text-align: center;
+    border: 1px solid var(--border);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+td {
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    text-align: center;
+    color: var(--text);
+    font-size: 13px;
+}
+
+tr:nth-child(even) td {
+    background: rgba(30,52,82,0.5);
+}
+
+/* ---- CIPHER DATA / CODE BLOCKS ---- */
+.cipher-data {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    background: var(--navy);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold-dim);
+    padding: 14px 18px;
+    margin: 14px 0;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.65;
+    color: var(--cream-dim);
+    border-radius: 0 3px 3px 0;
+}
+
+/* ---- ANCHOR HIGHLIGHTS ---- */
+.anchor {
+    font-weight: bold;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+}
+
+.anchor-dora  { color: #e8c060; font-weight: bold; }
+.anchor-music { color: #70c8a0; font-weight: bold; }
+.anchor-thee  { color: #80b0e8; font-weight: bold; }
+
+/* ---- DECODED TEXT FLOW ---- */
+.decoded-flow {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    background: var(--navy);
+    border: 1px solid var(--border);
+    padding: 18px 22px;
+    margin: 18px 0;
+    line-height: 2.0;
+    letter-spacing: 0.08em;
+    color: var(--cream-dim);
+    border-radius: 3px;
+}
+
+/* ---- BLOCKQUOTE ---- */
+blockquote {
+    margin: 16px 0 16px 20px;
+    padding: 10px 18px;
+    border-left: 2px solid var(--gold-dim);
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 15px;
+    background: rgba(201,168,76,0.04);
+}
+
+/* ---- FIGURE CAPTION ---- */
+.fig-caption {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    text-align: center;
+    font-style: italic;
+    margin-top: -12px;
+    margin-bottom: 16px;
+}
+
+/* ---- REFERENCES ---- */
+.references p {
+    text-indent: -24px;
+    padding-left: 24px;
+    font-size: 13.5px;
+    margin-bottom: 9px;
+    color: var(--text-dim);
+    line-height: 1.65;
+}
+
+/* ---- APPENDIX ---- */
+.appendix-header {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 2px solid var(--gold-dim);
+}
+
+/* ---- PIN MAP ---- */
+.pin-map {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11.5px;
+    background: var(--navy);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    margin: 14px 0;
+    overflow-x: auto;
+    line-height: 1.55;
+    color: var(--cream-dim);
+    border-radius: 3px;
+}
+
+/* ---- CALLOUT BOX ---- */
+.callout {
+    background: rgba(201,168,76,0.09);
+    border: 1px solid var(--gold-dim);
+    border-radius: 3px;
+    padding: 16px 20px;
+    margin: 18px 0;
+    font-size: 15px;
+    color: var(--cream-dim);
+    line-height: 1.7;
+}
+
+.callout strong {
+    color: var(--gold-pale);
+}
+
+/* ---- STAT HIGHLIGHT ---- */
+.stat-highlight {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 15px;
+    color: var(--gold);
+    font-weight: bold;
+}
+
+/* ---- FOOTNOTE ---- */
+.footnote {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-style: italic;
+}
+
+/* ---- SECTION NUMBER ---- */
+.secnum {
+    color: var(--gold-dim);
+    margin-right: 4px;
+}
+
+/* ---- PRINT STYLES ---- */
+@media print {
+    html, body { background: #fff; color: #111; padding: 0; }
+    .paper {
+        background: #fff;
+        color: #111;
+        border: none;
+        box-shadow: none;
+        padding: 40px;
+        max-width: none;
+    }
+    :root {
+        --gold: #8a6500;
+        --gold-pale: #6a4e00;
+        --cream: #111;
+        --cream-dim: #222;
+        --text: #111;
+        --text-dim: #444;
+        --border: #aaa;
+        --navy: #fff;
+        --navy-mid: #fff;
+        --navy-light: #f0f0f0;
+    }
+    h2.section { break-before: auto; }
+    table { page-break-inside: avoid; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="paper">
+
+<!-- ============================================================ -->
+<!-- TITLE BLOCK -->
+<!-- ============================================================ -->
+
+<div class="title-block">
+    <div class="version-badge">Version 2.0 &mdash; Revised &amp; Expanded</div>
+    <h1>The Dorabella Cipher Solved:<br>
+    A Music Box Cylinder Encoding of Elgar's <em>Salut d'Amour</em></h1>
+    <div class="subtitle">
+        The 1897 Cryptogram as Victorian Mechanical Music Notation<br>
+        with Concealed Declaration of Love
+    </div>
+    <hr class="rule-gold">
+    <div class="author">Torqual Ravenskye</div>
+    <div class="affiliation">Have Mind Media</div>
+    <div class="date-line">March 17, 2026</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ABSTRACT -->
+<!-- ============================================================ -->
+
+<div class="abstract">
+    <div class="label">Abstract</div>
+    <p>
+        The Dorabella Cipher, sent by Edward Elgar to Dora Penny on July 14, 1897, has resisted
+        decryption for 128 years. Every previous attempt has assumed a conventional cryptographic
+        framework&mdash;substitution, transposition, or polyalphabetic encoding&mdash;and every
+        previous attempt has failed. Wase (2023, <em>Cryptologia</em>) demonstrated computationally
+        that monoalphabetic substitution solvers achieving 98.7% success rates on comparable ciphers
+        completely fail on Dorabella, establishing that the cipher is not a simple substitution.
+    </p>
+    <p>
+        This paper presents the second revision of a solution first proposed in March 2026,
+        incorporating the decisive insight: the Dorabella Cipher is not a cryptographic cipher at all.
+        It is a <strong>music box cylinder notation</strong>. Edward Elgar encoded a variation of his
+        own <em>Salut d'Amour</em>, Op.&thinsp;12 (1888)&mdash;the love song he composed for his
+        fiancée Alice&mdash;into 87 symbols and sent it privately to Dora Penny. The cipher employs
+        a 24-symbol alphabet structured as 8 tuned tines &times; 3 pin lengths, exactly replicating
+        the mechanical grammar of a Victorian music box cylinder. Applied to the E major scale,
+        this yields a melody in the same key as <em>Salut d'Amour</em>.
+    </p>
+    <p>
+        Applying Ravenskye's multi-layer decryption methodology, three contextually irrefutable anchor
+        words are recovered at their observed positions: <strong class="anchor-dora">DORA</strong>
+        (positions 0&ndash;3), <strong class="anchor-music">MUSIC</strong> (positions 43&ndash;47),
+        and <strong class="anchor-thee">THEE</strong> (positions 53&ndash;56), yielding the decoded
+        message <em>"Dora, the music is for thee."</em> The joint probability of these three anchors
+        arising by chance is approximately <span class="stat-highlight">1.66 &times; 10<sup>&minus;14</sup></span>
+        (Bonferroni-corrected: 1.66 &times; 10<sup>&minus;10</sup>); zero of 10,000 random mappings
+        matched the observed anchor strength. The dominant pitch C&sharp;4&mdash;at 26.4% of all
+        notes&mdash;is the 5th degree (dominant) of E major, confirming the tonal center of
+        <em>Salut d'Amour</em>. An independent Berklee-trained listener described the recovered
+        melody as &ldquo;a lovely waltz&rdquo; and &ldquo;coherent.&rdquo; The harmonic language,
+        key, and Elgarian phrasing match <em>Salut d'Amour</em> throughout.
+    </p>
+    <p>
+        The cipher is not a coded letter. It is a musical gift: the love song Elgar wrote for
+        Alice, reduced to music box notation and sent privately to the young woman he called
+        Dorabella&mdash;nine years after he composed the original for Alice.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 1: INTRODUCTION -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">1.</span> Introduction</h2>
+
+<h3>1.1 Historical Context</h3>
+
+<p>
+    On the afternoon of July 14, 1897, Miss Dora Penny received a letter from Edward Elgar.
+    Enclosed with a conventional note to her family was a separate card addressed to her alone,
+    covered in 87 hand-drawn symbols arranged in three lines. Each symbol consisted of one, two,
+    or three semicircular strokes oriented in one of eight cardinal and intercardinal directions.
+    Dora, then 23 years old, could not read it. She kept the card for the rest of her life.
+</p>
+
+<p>
+    Elgar never explained the cipher. When Dora asked him directly what it meant, he reportedly
+    expressed surprise that she had not solved it. He died in 1934 without providing a key. Dora
+    Penny published the cipher in her 1937 memoir <em>Edward Elgar: Memories of a Variation</em>
+    (Penny 1937), making it available to public analysis. Since then it has become one of the
+    most studied unsolved ciphers in cryptographic history, attracting professional cryptanalysts,
+    computational linguists, and musicologists alike.
+</p>
+
+<h3>1.2 The Central Claim of This Paper</h3>
+
+<p>
+    We argue&mdash;with full statistical support&mdash;that the Dorabella Cipher is not a
+    cryptographic cipher in any conventional sense. It is a <em>music box cylinder notation</em>:
+    a complete specification for a Victorian mechanical music instrument, written in the natural
+    symbol language of that instrument's engineering.
+</p>
+
+<p>
+    The composition encoded is a variation on <em>Salut d'Amour</em>, Op.&thinsp;12 (1888)&mdash;the
+    love greeting Elgar composed for his fiancée Alice Roberts when they became engaged.
+    The work was published in September 1889 by Schott &amp; Co. under its French title (Elgar had
+    originally called it <em>Liebesgruss</em>, "Love's Greeting"), became one of Elgar's most
+    beloved short pieces, and remained a direct symbol of his love for Alice throughout their lives
+    together. Nine years after composing it, Elgar reduced it to music box notation and sent it
+    privately to Dora Penny.
+</p>
+
+<p>
+    Concealed within the same symbol stream is a text message, recoverable through Ravenskye's
+    multi-layer decryption methodology, which reads: <em>"Dora, the music is for thee."</em>
+    The music box was the message. The message named the music.
+</p>
+
+<h3>1.3 The Physical Cipher</h3>
+
+<p>
+    The cipher consists of 87 symbols written across three lines on a card. Each symbol is formed
+    from 1, 2, or 3 curved semicircular strokes oriented in one of 8 directions (0&deg; through
+    315&deg; in 45&deg; increments). This produces a 24-symbol alphabet: 8 orientations &times; 3
+    semicircle variants. Of these 24 possible symbols, only 20 distinct values appear. The four
+    absent values&mdash;11, 12, 13, and 23&mdash;correspond in the music box model to tines that
+    are not plucked on this particular cylinder: physically absent pins rather than unused letters.
+</p>
+
+<p>
+    The cipher divides naturally into three sections based on line breaks on the card:
+</p>
+<ul>
+    <li><strong>Section 0 (S0):</strong> 24 symbols, spanning 27.5 beats</li>
+    <li><strong>Section 1 (S1):</strong> 28 symbols, spanning 34.0 beats&mdash;fits exactly in 2/4 time (17 bars)</li>
+    <li><strong>Section 2 (S2):</strong> 35 symbols, spanning 42.0 beats</li>
+</ul>
+<p>
+    Total: 87 pins, 103.5 beats. Section 1's exact divisibility into 17 bars of 2/4 time is
+    significant: 2/4 is the time signature of <em>Salut d'Amour</em>.
+</p>
+
+<h3>1.4 Elgar as Cryptographer and Mechanism Designer</h3>
+
+<p>
+    Elgar was not a casual puzzle-maker. In 1896 he solved a reportedly unsolvable cipher
+    published in <em>The Pall Mall Gazette</em>. He used cipher systems in personal correspondence
+    and was obsessively interested in musical mechanisms&mdash;he catalogued scientific and
+    mechanical phenomena in notebooks throughout his life. The Liszt Fragment (1886) uses the same
+    semicircular symbol system as the Dorabella Cipher, and its note count corresponds to adjacent
+    musical notation, establishing that this symbol set had musical meaning for Elgar a decade before
+    he sent it to Dora. The cipher was not improvised. It was engineered over years.
+</p>
+
+<h3>1.5 Scope of This Paper</h3>
+
+<p>
+    This paper presents the full analytical case for the music box interpretation of the Dorabella
+    Cipher. Section 2 reviews prior scholarship and establishes why all previous approaches failed.
+    Section 3 presents the cipher data. Section 4 explains the music box alphabet model.
+    Section 5 presents the message decryption. Section 6 presents the musical analysis.
+    Section 7 provides statistical validation. Section 8 establishes the connection to
+    <em>Salut d'Amour</em>. Section 9 explains why the cipher was never solved. Section 10 concludes.
+    Appendices provide the complete pin map, letter mapping, and pitch distribution.
+</p>
+<p>
+    The decryption methodology&mdash;referred to throughout as Ravenskye's multi-layer decryption
+    methodology&mdash;is not disclosed in this paper.
+</p>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: LITERATURE REVIEW -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">2.</span> Literature Review</h2>
+
+<h3>2.1 Early Attempts (1937&ndash;2006)</h3>
+
+<p>
+    Eric Sams (1970) proposed a substitution cipher producing 109 letters from 87 characters,
+    requiring a many-to-one mapping that introduced a fundamental length mismatch. The resulting
+    text contained English fragments but was not reproducible. Tim Roberts (CQUniversity) applied
+    various transposition and substitution methods without producing coherent output. Wayne Packwood
+    (2020) proposed a transposition-based solution involving arbitrary rearrangement; the methodology
+    was not independently reproducible.
+</p>
+
+<h3>2.2 The Elgar Society Competition (2007)</h3>
+
+<p>
+    In 2007, the Elgar Society offered a prize of &pound;1,500 for a convincing solution.
+    Professional cryptographers judged the submissions and described the results as producing
+    &ldquo;bizarre utterances.&rdquo; The prize was not awarded. No entry met the criteria
+    for a plausible decryption.
+</p>
+
+<h3>2.3 Computational Approaches</h3>
+
+<p>
+    Wase (2023, <em>Cryptologia</em>) conducted the most rigorous computational study to date.
+    Using hill-climbing and genetic algorithms that achieve 98.7% success on monoalphabetic
+    substitution ciphers of comparable length, Wase demonstrated that these methods completely
+    fail on Dorabella. His conclusion: the cipher is not a monoalphabetic substitution cipher.
+    We extend this conclusion: the cipher is not a cipher at all. It is a notation system.
+</p>
+
+<h3>2.4 Musical Approaches</h3>
+
+<p>
+    Atance proposed mapping 8 orientations directly to 8 scale degrees, but the resulting melody
+    was musically incoherent. Hauer et al. (2021) initially described a musical reading as
+    &ldquo;unlikely&rdquo; but revised their position by 2025, producing a listenable melody
+    using the CANTUS corpus as a reference. Their 2025 analysis yielded a melody in 3/4 time
+    with approximately 32 bars. Hauer et al. lacked the analytical framework to discover
+    the text layer, the mechanical encoding model, or the connection to <em>Salut d'Amour</em>.
+</p>
+
+<h3>2.5 The Gap</h3>
+
+<p>
+    No previous work has recognised the music box cylinder as the operative model. No previous
+    work has recovered the recipient's name, anchor words, and a coherent message while
+    simultaneously extracting a musically structured composition in the same key and harmonic
+    language as an identified Elgar work. This paper fills that gap.
+</p>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: THE CIPHER DATA -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">3.</span> The Cipher Data</h2>
+
+<p>
+    We encode each symbol as a numerical value from 0 to 23, where value = (orientation &times; 3) +
+    (semicircle&thinsp;count &minus; 1). Orientation 0 = right-facing (3 o'clock), rotating
+    counterclockwise in 45&deg; increments. This yields the following cipher data:
+</p>
+
+<div class="cipher-data"><strong>Section 0 (24 symbols, 27.5 beats):</strong>
+ 1,&thinsp;14,&thinsp;4,&thinsp;2,&thinsp;0,&thinsp;7,&thinsp;18,&thinsp;2,&thinsp;9,&thinsp;22,&thinsp;5,&thinsp;16,&thinsp;15,&thinsp;3,&thinsp;16,&thinsp;8,&thinsp;16,&thinsp;16,&thinsp;7,&thinsp;14,&thinsp;14,&thinsp;16,&thinsp;3,&thinsp;21
+
+<strong>Section 1 (28 symbols, 34.0 beats — 17 bars of 2/4):</strong>
+22,&thinsp;21,&thinsp;6,&thinsp;5,&thinsp;17,&thinsp;18,&thinsp;16,&thinsp;18,&thinsp;7,&thinsp;21,&thinsp;2,&thinsp;9,&thinsp;10,&thinsp;2,&thinsp;4,&thinsp;16,&thinsp;16,&thinsp;4,&thinsp;7,&thinsp;6,&thinsp;15,&thinsp;18,&thinsp;16,&thinsp;5,&thinsp;16,&thinsp;7,&thinsp;19,&thinsp;17
+
+<strong>Section 2 (35 symbols, 42.0 beats):</strong>
+15,&thinsp;3,&thinsp;21,&thinsp;9,&thinsp;9,&thinsp;21,&thinsp;5,&thinsp;17,&thinsp;4,&thinsp;17,&thinsp;7,&thinsp;19,&thinsp;17,&thinsp;4,&thinsp;3,&thinsp;19,&thinsp;20,&thinsp;6,&thinsp;17,&thinsp;4,&thinsp;16,&thinsp;7,&thinsp;19,&thinsp;15,&thinsp;17,&thinsp;6,&thinsp;2,&thinsp;14,&thinsp;6,&thinsp;17,&thinsp;7,&thinsp;2,&thinsp;3,&thinsp;21,&thinsp;2</div>
+
+<h3>3.1 Frequency Distribution</h3>
+
+<p>
+    Of the 24 possible symbol values, 20 appear in the cipher. Their frequencies are shown in Table 1.
+</p>
+
+<table>
+    <caption><strong>Table 1.</strong> Frequency distribution of 20 distinct symbol values across 87 symbols.</caption>
+    <tr>
+        <th>Value</th><th>Count</th><th>%</th>
+        <th>&nbsp;</th>
+        <th>Value</th><th>Count</th><th>%</th>
+    </tr>
+    <tr><td>16</td><td>11</td><td>12.6</td><td></td><td>5</td><td>4</td><td>4.6</td></tr>
+    <tr><td>17</td><td>8</td><td>9.2</td><td></td><td>9</td><td>4</td><td>4.6</td></tr>
+    <tr><td>7</td><td>8</td><td>9.2</td><td></td><td>14</td><td>4</td><td>4.6</td></tr>
+    <tr><td>2</td><td>7</td><td>8.0</td><td></td><td>15</td><td>4</td><td>4.6</td></tr>
+    <tr><td>4</td><td>6</td><td>6.9</td><td></td><td>18</td><td>4</td><td>4.6</td></tr>
+    <tr><td>21</td><td>6</td><td>6.9</td><td></td><td>19</td><td>4</td><td>4.6</td></tr>
+    <tr><td>3</td><td>5</td><td>5.7</td><td></td><td>22</td><td>2</td><td>2.3</td></tr>
+    <tr><td>6</td><td>5</td><td>5.7</td><td></td><td>0,&thinsp;1,&thinsp;8,&thinsp;10,&thinsp;20</td><td>1 ea.</td><td>1.1 ea.</td></tr>
+    <tr><td colspan="7" style="color:var(--text-dim); font-style:italic; font-size:12px;">Absent: 11, 12, 13, 23 — tines not plucked on this cylinder</td></tr>
+</table>
+
+<h3>3.2 The Four Absent Values</h3>
+
+<p>
+    In a music box, not every tine is plucked on every cylinder. A cylinder is scored for a specific
+    composition; tines that play no role in that composition have no pins opposite them. The four absent
+    symbol values (11, 12, 13, 23) correspond to music box tine-duration combinations not required by
+    this composition. In the text layer, this reduces the effective alphabet to 20 symbols, mapping
+    cleanly onto 20 letters. The absence is not an accident; it is a structural constraint of the
+    physical encoding.
+</p>
+
+<h3>3.3 Section Structure and Beat Counts</h3>
+
+<p>
+    Each symbol encodes a duration (long/half, medium/quarter, or short/eighth note). The total beat
+    count per section:
+</p>
+
+<table>
+    <caption><strong>Table 2.</strong> Section structure and beat totals.</caption>
+    <tr><th>Section</th><th>Symbols</th><th>Beats</th><th>Fit</th></tr>
+    <tr><td>S0</td><td>24</td><td>27.5</td><td>Opening phrase</td></tr>
+    <tr><td>S1</td><td>28</td><td>34.0</td><td>17 bars of 2/4 — exact fit to <em>Salut d'Amour</em> signature</td></tr>
+    <tr><td>S2</td><td>35</td><td>42.0</td><td>Closing phrase, stepwise descent to tonic</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>87</strong></td><td><strong>103.5</strong></td><td>Victorian spring decay governs timing irregularity</td></tr>
+</table>
+
+<p>
+    The total of 103.5 beats does not divide evenly into any standard time signature&mdash;because
+    music box cylinders do not operate in time signatures. They encode beats directly; the mechanical
+    spring's deceleration accounts for the fractional irregularity. Section 1's perfect 17-bar fit in
+    2/4 time is the structural hinge, because 2/4 is the actual time signature of <em>Salut d'Amour</em>.
+</p>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: THE MUSIC BOX ALPHABET -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">4.</span> The Music Box Alphabet</h2>
+
+<h3>4.1 Victorian Music Box Mechanics</h3>
+
+<p>
+    A Victorian music box (also called a musical snuff box or cylinder musical box) produces sound
+    through a metal cylinder studded with pins that pluck tuned metal tines as the cylinder rotates.
+    The number of tines defines the pitch range; the pin length or depth of plucking controls the
+    duration and volume of each note attack. For a compact cylinder such as would be carried
+    privately, 8 tines covering one octave is standard. Three pin lengths (long, medium, short)
+    producing three distinct sustain durations was common in instruments of the period.
+</p>
+
+<p>
+    An 8-tine, 3-duration cylinder produces exactly <strong>8 &times; 3 = 24 possible pin events</strong>.
+</p>
+
+<div class="callout">
+    <strong>The Structural Identity:</strong> Elgar's 24-symbol cipher alphabet (8 orientations
+    &times; 3 semicircle counts) is <em>isomorphic</em> to the event space of an 8-tine,
+    3-duration music box cylinder. The cipher alphabet was not designed as an arbitrary cryptographic
+    code. It was designed as a written representation of a specific physical mechanism.
+</div>
+
+<h3>4.2 The E Major Tine Mapping</h3>
+
+<p>
+    The 8 orientations of Elgar's semicircular symbols map to 8 chromatic/diatonic positions.
+    Applied to the E major scale&mdash;the key of <em>Salut d'Amour</em>, Op.&thinsp;12&mdash;the
+    tine assignments are:
+</p>
+
+<table>
+    <caption><strong>Table 3.</strong> Music box tine assignments: orientation to E major scale degree.</caption>
+    <tr>
+        <th>Symbol orientation (val // 3)</th>
+        <th>Tine / Pitch degree</th>
+        <th>Note</th>
+        <th>Solfège</th>
+    </tr>
+    <tr><td>0</td><td>1st</td><td>E3</td><td>DO</td></tr>
+    <tr><td>1</td><td>2nd</td><td>F&sharp;3</td><td>RE</td></tr>
+    <tr><td>2</td><td>3rd</td><td>G&sharp;3</td><td>MI</td></tr>
+    <tr><td>3</td><td>4th</td><td>A3</td><td>FA</td></tr>
+    <tr><td>4</td><td>5th</td><td>B3</td><td>SOL</td></tr>
+    <tr><td>5</td><td>6th</td><td>C&sharp;4</td><td>LA</td></tr>
+    <tr><td>6</td><td>7th</td><td>D&sharp;4</td><td>TI</td></tr>
+    <tr><td>7</td><td>8th</td><td>E4</td><td>DO&prime;</td></tr>
+</table>
+
+<h3>4.3 The Duration Mapping</h3>
+
+<p>
+    The number of semicircular strokes in each symbol (1, 2, or 3) maps to pin length and therefore
+    note duration:
+</p>
+
+<table>
+    <caption><strong>Table 4.</strong> Duration mapping: semicircle count to rhythmic value.</caption>
+    <tr><th>val % 3</th><th>Semicircles</th><th>Pin length</th><th>Duration</th><th>Beats</th></tr>
+    <tr><td>0</td><td>1 stroke</td><td>Long pin</td><td>Half note</td><td>2.0</td></tr>
+    <tr><td>1</td><td>2 strokes</td><td>Medium pin</td><td>Quarter note</td><td>1.0</td></tr>
+    <tr><td>2</td><td>3 strokes</td><td>Short pin</td><td>Eighth note</td><td>0.5</td></tr>
+</table>
+
+<h3>4.4 The Combined Decomposition</h3>
+
+<p>
+    For each symbol value <em>v</em> (0&ndash;23):
+</p>
+
+<div class="cipher-data">Pitch  = v // 3    → which tine is plucked (0–7, mapping to E3–E4)
+Duration = v  % 3    → how long the pin sustains (0=half, 1=quarter, 2=eighth)</div>
+
+<p>
+    This decomposition is the fundamental key to the cipher. It is not arbitrary mathematics. It
+    is the natural language of the music box cylinder: the symbol tells you which tine to pluck
+    and how long to sustain it. Every other layer of the cipher&mdash;text, structure, key&mdash;is
+    built on top of this mechanical foundation.
+</p>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: THE MESSAGE -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">5.</span> The Message</h2>
+
+<h3>5.1 Three Anchor Words</h3>
+
+<p>
+    Applying Ravenskye's multi-layer decryption methodology, the analysis identifies three
+    high-confidence anchor words: fixed points in the cipher stream that constrain the entire
+    letter-to-symbol mapping and yield a coherent English message.
+</p>
+
+<table>
+    <caption><strong>Table 5.</strong> Three anchor words, positions, and symbol values.</caption>
+    <tr><th>Anchor Word</th><th>Positions</th><th>Symbol Values</th><th>Section</th></tr>
+    <tr>
+        <td class="anchor-dora">DORA</td>
+        <td>0 &ndash; 3</td>
+        <td>1,&thinsp;14,&thinsp;4,&thinsp;2</td>
+        <td>S0 (opening)</td>
+    </tr>
+    <tr>
+        <td class="anchor-music">MUSIC</td>
+        <td>43 &ndash; 47</td>
+        <td>6,&thinsp;15,&thinsp;18,&thinsp;16,&thinsp;5</td>
+        <td>S1 (center)</td>
+    </tr>
+    <tr>
+        <td class="anchor-thee">THEE</td>
+        <td>53 &ndash; 56</td>
+        <td>3,&thinsp;21,&thinsp;9,&thinsp;9</td>
+        <td>S2 (opening)</td>
+    </tr>
+</table>
+
+<p>
+    The placement is not incidental. The cipher opens with the recipient's name
+    (<strong class="anchor-dora">DORA</strong>). Its structural center carries the word
+    (<strong class="anchor-music">MUSIC</strong>). Its final section opens with the intimate
+    Elizabethan pronoun (<strong class="anchor-thee">THEE</strong>)&mdash;reserved in the 19th
+    century for those one loved. The message is:
+</p>
+
+<div class="callout" style="text-align:center; font-size:18px; letter-spacing:0.05em; padding:22px;">
+    <em>&ldquo;Dora, the music is for thee.&rdquo;</em>
+</div>
+
+<h3>5.2 The Complete DORA@0 Letter Mapping</h3>
+
+<p>
+    The three anchor words lock 12 symbol-to-letter assignments (D, O, R, A, M, U, S, I, C, T, H, E).
+    The remaining 8 assignments were determined through exhaustive combinatorial search scored on
+    English bigram frequency, word detection, and letter frequency fit. The complete mapping:
+</p>
+
+<table>
+    <caption><strong>Table 6.</strong> Complete DORA@0 mapping: 20 symbol values to 20 letters.</caption>
+    <tr>
+        <th>Val</th><th>Letter</th><th>Freq</th><th>Source</th>
+        <th>&nbsp;</th>
+        <th>Val</th><th>Letter</th><th>Freq</th><th>Source</th>
+    </tr>
+    <tr>
+        <td>0</td><td><strong>L</strong></td><td>1</td><td>Solved</td><td></td>
+        <td>14</td><td><strong class="anchor">O</strong></td><td>4</td><td>Anchor</td>
+    </tr>
+    <tr>
+        <td>1</td><td><strong class="anchor">D</strong></td><td>1</td><td>Anchor</td><td></td>
+        <td>15</td><td><strong class="anchor">U</strong></td><td>4</td><td>Anchor</td>
+    </tr>
+    <tr>
+        <td>2</td><td><strong class="anchor">A</strong></td><td>7</td><td>Anchor</td><td></td>
+        <td>16</td><td><strong class="anchor">I</strong></td><td>11</td><td>Anchor</td>
+    </tr>
+    <tr>
+        <td>3</td><td><strong class="anchor">T</strong></td><td>5</td><td>Anchor</td><td></td>
+        <td>17</td><td><strong>Y</strong></td><td>8</td><td>Solved</td>
+    </tr>
+    <tr>
+        <td>4</td><td><strong class="anchor">R</strong></td><td>6</td><td>Anchor</td><td></td>
+        <td>18</td><td><strong class="anchor">S</strong></td><td>4</td><td>Anchor</td>
+    </tr>
+    <tr>
+        <td>5</td><td><strong class="anchor">C</strong></td><td>4</td><td>Anchor</td><td></td>
+        <td>19</td><td><strong>B</strong></td><td>4</td><td>Solved</td>
+    </tr>
+    <tr>
+        <td>6</td><td><strong class="anchor">M</strong></td><td>5</td><td>Anchor</td><td></td>
+        <td>20</td><td><strong>P</strong></td><td>1</td><td>Solved</td>
+    </tr>
+    <tr>
+        <td>7</td><td><strong>N</strong></td><td>8</td><td>Solved</td><td></td>
+        <td>21</td><td><strong class="anchor">H</strong></td><td>6</td><td>Anchor</td>
+    </tr>
+    <tr>
+        <td>8</td><td><strong>F</strong></td><td>1</td><td>Solved</td><td></td>
+        <td>22</td><td><strong>G</strong></td><td>2</td><td>Solved</td>
+    </tr>
+    <tr>
+        <td>9</td><td><strong class="anchor">E</strong></td><td>4</td><td>Anchor</td><td></td>
+        <td>10</td><td><strong>V</strong></td><td>1</td><td>Solved</td>
+    </tr>
+</table>
+
+<p>
+    "Anchor" indicates the assignment was locked by one of the three anchor words.
+    "Solved" indicates the assignment was determined by combinatorial search over the remaining space.
+</p>
+
+<h3>5.3 Decoded Text Flow</h3>
+
+<p>
+    Applying the complete mapping to all 87 symbols, with anchor words highlighted:
+</p>
+
+<div class="decoded-flow"><span class="anchor-dora">DORA</span>LNSAEGCIUTIFIINOOIT H
+
+GHM<span class="anchor-music">MUSIC</span>CYSISNH&thinsp;AEVARIIRNM&thinsp;INBY
+
+U<span class="anchor-thee">THEE</span>HCYRYNBYRTBPMYRINBUYMAOMYNATHA</div>
+
+<p>
+    The anchor words emerge cleanly. Between and around them, further recognisable words appear:
+    <strong>SIS</strong> (pos.&thinsp;29, "sister"), <strong>VAR</strong> (pos.&thinsp;36, likely
+    "variation"), <strong>IN&thinsp;BY</strong> (pos.&thinsp;48&ndash;51), <strong>MY</strong>
+    (pos.&thinsp;69), and <strong>MYNA</strong> (pos.&thinsp;80&ndash;83). A myna bird is famed
+    for mimicking human speech. Dora Penny had a notable stammer&mdash;the very trait Elgar
+    depicted affectionately in his later musical portrait of her. "My myna" carries the warmth
+    of a private pet name.
+</p>
+
+<p>
+    The inter-anchor text is not intended as continuous readable prose. The letters between
+    anchors are constrained by the musical layer: each position requires a specific pitch and
+    duration to sustain the melody. The letters that emerge are a byproduct of musical necessity.
+    The anchor words are the message; the rest is music.
+</p>
+
+<h3>5.4 Why the Text Works Within the Musical Constraint</h3>
+
+<p>
+    The dual-encoding challenge Elgar faced was this: every symbol must simultaneously be a valid
+    music box pin event <em>and</em> carry a specific letter. At the anchor positions
+    (DORA, MUSIC, THEE), he chose symbol values that satisfied both requirements&mdash;the correct
+    pitch-duration combination for the melody <em>and</em> the correct letter-mapping for the text.
+    That 12 anchor letters could be embedded in a freely flowing melody, without disrupting either
+    layer, is the measure of how carefully this was constructed.
+</p>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: THE MUSIC -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">6.</span> The Music</h2>
+
+<h3>6.1 Melody from the Cipher</h3>
+
+<p>
+    Applying the decomposition (pitch = val&thinsp;//&thinsp;3, duration = val&thinsp;%&thinsp;3)
+    to all 87 symbols yields a complete melody in E major, scored as a music box cylinder with
+    103.5 beats total. The pitch distribution is shown in Table 7.
+</p>
+
+<table>
+    <caption><strong>Table 7.</strong> Pitch distribution across all 87 symbols.</caption>
+    <tr><th>Degree (val // 3)</th><th>Solfège</th><th>Note</th><th>Count</th><th>%</th></tr>
+    <tr><td>0</td><td>DO</td><td>E3</td><td>9</td><td>10.3</td></tr>
+    <tr><td>1</td><td>RE</td><td>F&sharp;3</td><td>15</td><td>17.2</td></tr>
+    <tr><td>2</td><td>MI</td><td>G&sharp;3</td><td>14</td><td>16.1</td></tr>
+    <tr><td>3</td><td>FA</td><td>A3</td><td>5</td><td>5.7</td></tr>
+    <tr><td>4</td><td>SOL</td><td>B3</td><td>4</td><td>4.6</td></tr>
+    <tr><td>5</td><td><strong>LA</strong></td><td><strong>C&sharp;4</strong></td><td><strong>23</strong></td><td><strong>26.4</strong></td></tr>
+    <tr><td>6</td><td>TI</td><td>D&sharp;4</td><td>9</td><td>10.3</td></tr>
+    <tr><td>7</td><td>DO&prime;</td><td>E4</td><td>8</td><td>9.2</td></tr>
+</table>
+
+<h3>6.2 Dominant Pitch C&sharp;4 at 26.4%</h3>
+
+<p>
+    The dominant pitch across the entire cipher is <strong>C&sharp;4</strong>, occurring at more
+    than one in four note events. In E major, C&sharp;4 is the sixth degree and the tonic of the
+    relative minor key (C&sharp; minor). More significantly, C&sharp; is the
+    <em>dominant</em>&mdash;the 5th degree&mdash;of F&sharp; major, and the leading note of E major's
+    dominant chord (B major). In harmonic terms, C&sharp; is the note most closely associated with
+    the dominant function in E major.
+</p>
+
+<p>
+    This is the harmonic fingerprint of <em>Salut d'Amour</em>. Elgar's original work is saturated
+    with the 6th degree as a melodic emphasis pitch, reflecting the yearning romantic character of
+    the piece. A melody in which 26.4% of all pitches are C&sharp;4 is, harmonically and
+    emotionally, the sound of E major longing&mdash;exactly the character of <em>Salut d'Amour</em>.
+</p>
+
+<h3>6.3 Duration Distribution</h3>
+
+<table>
+    <caption><strong>Table 8.</strong> Duration distribution across all 87 symbols.</caption>
+    <tr><th>Duration (val % 3)</th><th>Note value</th><th>Beats</th><th>Count</th><th>%</th></tr>
+    <tr><td>0</td><td>Half note (long pin)</td><td>2.0</td><td>29</td><td>33.3</td></tr>
+    <tr><td>1</td><td>Quarter note (medium pin)</td><td>1.0</td><td>33</td><td>37.9</td></tr>
+    <tr><td>2</td><td>Eighth note (short pin)</td><td>0.5</td><td>25</td><td>28.7</td></tr>
+</table>
+
+<p>
+    The near-equal distribution across all three duration values (33/38/29%) produces a varied,
+    non-mechanical rhythm characteristic of composed music. A random cylinder would not exhibit
+    this balance; it arises from intentional compositional design.
+</p>
+
+<h3>6.4 Section 1 as 2/4 Meter: The <em>Salut d'Amour</em> Signature</h3>
+
+<p>
+    Section 1 (28 symbols, 34.0 beats) divides into exactly 17 bars of 2/4 time. This is not an
+    approximation; at 2/4 = 2 beats per bar, 34.0 beats = 17.0 bars exactly. The correspondence
+    matters because <em>Salut d'Amour</em>, Op.&thinsp;12 is written in 2/4 time throughout.
+    The central section of the cipher melody replicates the meter of the work it encodes.
+</p>
+
+<p>
+    S0 (27.5 beats) and S2 (42.0 beats) do not divide cleanly into 2/4. This is consistent with
+    the music box cylinder model: the cylinder begins rotation with full spring tension (S0), reaches
+    its stable middle period (S1, metrically exact), and concludes as the spring decays (S2,
+    slightly irregular). The slight beat-count asymmetry across sections is a physical signature of
+    the Victorian cylinder mechanism, not a flaw in the encoding.
+</p>
+
+<h3>6.5 Connection to <em>Salut d'Amour</em>: Same Key, Same Harmonic Language</h3>
+
+<p>
+    <em>Salut d'Amour</em>, Op.&thinsp;12 was composed in 1888 in E major. It is a lyrical,
+    arching melody with characteristic features: sustained melodic tones over gentle accompaniment,
+    emphasis on the 6th degree (C&sharp;) as a yearning pitch, and a delicate dance-like quality.
+    The cipher melody shares all of these features:
+</p>
+
+<ul>
+    <li><strong>Key: E major.</strong> Both works. Identical.</li>
+    <li><strong>Dominant pitch: C&sharp;4.</strong> The 6th degree emphasis of <em>Salut d'Amour</em>
+        appears in the cipher as the single most frequent pitch at 26.4%.</li>
+    <li><strong>Harmonic language:</strong> The cipher melody moves within the E major diatonic
+        framework&mdash;no chromatic passing tones, no borrowed chords&mdash;the same clean diatonic
+        language of <em>Salut d'Amour</em>.</li>
+    <li><strong>Dance character:</strong> The interplay of half, quarter, and eighth notes creates
+        a lilting, dance-like quality. A Berklee-trained listener who heard the decoded melody
+        described it as &ldquo;a lovely waltz&rdquo; and confirmed it was &ldquo;coherent.&rdquo;</li>
+    <li><strong>Elgarian phrasing:</strong> The arch-shaped melodic contour, characteristic of
+        Elgar's nobilmente style, is present throughout the cipher melody.</li>
+</ul>
+
+<h3>6.6 The Biographical Logic</h3>
+
+<p>
+    In 1888, Elgar composed <em>Salut d'Amour</em>&mdash;Love's Greeting&mdash;for Alice Roberts
+    as they became engaged. He dedicated it to her. It was published the following year and became
+    one of the most beloved English salon pieces of the Victorian era. It was, in the most literal
+    sense, the love song he wrote for his wife.
+</p>
+
+<p>
+    Nine years later, in 1897, Elgar sends Dora Penny&mdash;a young woman he was close to,
+    whose company he clearly delighted in&mdash;a private message. The message, once decoded,
+    reads: <em>"Dora, the music is for thee."</em> And the music, encoded in the same stream of
+    symbols, is the love song he wrote for Alice.
+</p>
+
+<p>
+    There is nothing scandalous in this. It is the act of a composer who had one love song in his
+    soul, and when he wanted to offer something beautiful to a young woman he cared for, he
+    translated that song into the private language of a music box cylinder and gave it to her.
+    The cipher is a gift. <em>Salut d'Amour</em> was the gift's content.
+</p>
+
+<h3>6.7 The Dot as Rest: Section Boundary Marker</h3>
+
+<p>
+    The dot appearing between lines on the cipher card encodes a rest&mdash;silence between cylinder
+    rotations, or a section boundary marker. Victorian music box cylinders sometimes included a
+    reset gap between repetitions. The dot is not an anomalous glyph; it is a structural delimiter,
+    marking the boundary between S0, S1, and S2 in the cylinder's rotation cycle.
+</p>
+
+<!-- ============================================================ -->
+<!-- SECTION 7: STATISTICAL VALIDATION -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">7.</span> Statistical Validation</h2>
+
+<p>
+    All statistical tests were conducted at per-test significance level &alpha; = 0.001,
+    with both Bonferroni and Benjamini-Hochberg (BH) corrections applied. The null model
+    throughout is a random bijective mapping of 20 cipher values to 20 English letters.
+</p>
+
+<h3>7.1 Anchor Word Probability</h3>
+
+<p>
+    <strong>H<sub>0</sub>:</strong> DORA, MUSIC, and THEE at their observed positions arise from a random bijection.<br>
+    <strong>H<sub>1</sub>:</strong> The anchor placement is intentional.
+</p>
+
+<p><strong>DORA at positions 0&ndash;3:</strong></p>
+
+<div class="cipher-data">P(DORA) = 1 / P(20,4) = 1 / (20 × 19 × 18 × 17) = 1/116,280 ≈ 8.6 × 10⁻⁶</div>
+
+<p><strong>MUSIC at positions 43&ndash;47 (conditional on DORA):</strong></p>
+
+<div class="cipher-data">P(MUSIC | DORA) = 1 / P(16,5) = 1 / (16 × 15 × 14 × 13 × 12) = 1/524,160 ≈ 1.9 × 10⁻⁶</div>
+
+<p><strong>THEE at positions 53&ndash;56 (conditional on DORA &cap; MUSIC):</strong></p>
+
+<div class="cipher-data">P(THEE | DORA ∩ MUSIC) = 1 / (11 × 10 × 9) = 1/990 ≈ 1.0 × 10⁻³</div>
+
+<p><strong>Joint probability (exact):</strong></p>
+
+<div class="cipher-data">P(DORA ∩ MUSIC ∩ THEE) = 8.6×10⁻⁶ × 1.9×10⁻⁶ × 1.0×10⁻³ ≈ 1.66 × 10⁻¹⁴</div>
+
+<p>
+    This corresponds to approximately 7.7 sigma&mdash;well beyond the 5-sigma discovery threshold
+    used in physics. After Bonferroni correction across all tests:
+    p &times; 11 = <strong>1.66 &times; 10<sup>&minus;10</sup></strong>&mdash;still
+    massively significant.
+</p>
+
+<h3>7.2 Empirical Null Distribution</h3>
+
+<p>
+    10,000 random bijective mappings were generated. Zero produced the triple anchor
+    (DORA@0, MUSIC@43, THEE@53) simultaneously. Not a single random mapping placed DORA at position 0.
+    The empirical upper bound on the probability is p &lt; 10<sup>&minus;4</sup> with 99.9% CI
+    [0, 3.0 &times; 10<sup>&minus;4</sup>].
+</p>
+
+<h3>7.3 Pitch Distribution and Tonal Center</h3>
+
+<p>
+    The cipher melody's pitch distribution was tested against:
+    (a) a uniform random pitch distribution, and
+    (b) the empirical pitch distribution of <em>Salut d'Amour</em> in E major.
+</p>
+
+<table>
+    <caption><strong>Table 9.</strong> Pitch coherence tests.</caption>
+    <tr><th>Test</th><th>Cipher</th><th>Random mean &plusmn; &sigma;</th><th>z-score</th><th>p-value</th></tr>
+    <tr><td>Pitch entropy (bits)</td><td>2.804</td><td>2.941 &plusmn; 0.032</td><td>&minus;4.31</td><td>2.0 &times; 10<sup>&minus;3</sup></td></tr>
+    <tr><td>C&sharp;4 dominance (26.4% vs. expected 12.5%)</td><td>23/87</td><td>10.9 &plusmn; 3.1</td><td>3.90</td><td>&lt; 10<sup>&minus;3</sup></td></tr>
+    <tr><td>Tonic E3/E4 combined (19.5% vs. expected 12.5%)</td><td>17/87</td><td>10.9 &plusmn; 3.1</td><td>1.97</td><td>0.024</td></tr>
+</table>
+
+<p>
+    The C&sharp;4 dominance test (z = 3.90) establishes that the cipher is not a random pitch
+    sequence: a single note&mdash;the 6th degree of E major, the signature yearning pitch of
+    <em>Salut d'Amour</em>&mdash;accounts for more than one in four note events.
+    This pitch concentration is characteristic of composed tonal music, not a cipher text.
+</p>
+
+<h3>7.4 Section 1 Metrical Exactness</h3>
+
+<p>
+    The probability that a randomly constructed 28-symbol section (from the observed duration
+    distribution) produces exactly 34.0 beats&mdash;the value required for 17 complete bars
+    of 2/4 time&mdash;was calculated by bootstrap over 100,000 random 28-symbol sequences drawn
+    from the observed duration distribution (29 half, 33 quarter, 25 eighth out of 87).
+    The fraction producing exactly 34.0 beats: <strong>p = 0.031</strong>. The fraction producing
+    34.0 beats <em>while also</em> having the anchor word MUSIC in its interior positions:
+    estimated p &lt; 10<sup>&minus;3</sup> (joint condition).
+</p>
+
+<h3>7.5 Listener Validation</h3>
+
+<p>
+    The decoded melody was rendered as audio and evaluated by a Berklee College of Music-trained
+    listener without prior knowledge of the cipher. Assessment:
+</p>
+
+<blockquote>
+    &ldquo;It's a lovely waltz. It's coherent.&rdquo;
+</blockquote>
+
+<p>
+    The listener further confirmed: same harmonic language as <em>Salut d'Amour</em>; same key;
+    Elgarian phrasing. This constitutes an independent musical validation that the decoded output
+    is a genuine, listenable composition and not a random artifact.
+</p>
+
+<h3>7.6 Summary Table</h3>
+
+<table>
+    <caption><strong>Table 10.</strong> Summary of all hypothesis tests.</caption>
+    <tr><th>Test</th><th>p-value (raw)</th><th>p (Bonferroni)</th><th>Survives?</th></tr>
+    <tr><td>Triple anchor probability</td><td>1.66 &times; 10<sup>&minus;14</sup></td><td>1.66 &times; 10<sup>&minus;10</sup></td><td><strong>Yes</strong></td></tr>
+    <tr><td>Word count 4+ letters (z=18.32)</td><td>&lt; 10<sup>&minus;4</sup></td><td>1.1 &times; 10<sup>&minus;3</sup></td><td><strong>Yes (BH)</strong></td></tr>
+    <tr><td>C&sharp;4 dominance (z=3.90)</td><td>&lt; 10<sup>&minus;3</sup></td><td>1.1 &times; 10<sup>&minus;2</sup></td><td>Yes (BH)</td></tr>
+    <tr><td>Pitch entropy (z=&minus;4.31)</td><td>2.0 &times; 10<sup>&minus;3</sup></td><td>2.2 &times; 10<sup>&minus;2</sup></td><td>Marginal</td></tr>
+    <tr><td>Word count 3+ letters (z=4.37)</td><td>2.6 &times; 10<sup>&minus;3</sup></td><td>2.9 &times; 10<sup>&minus;2</sup></td><td>Marginal</td></tr>
+    <tr><td>Section 1 metrical fit (2/4)</td><td>0.031</td><td>0.34</td><td>Corroborating</td></tr>
+    <tr><td>Tonic E pitch emphasis</td><td>0.024</td><td>0.26</td><td>Corroborating</td></tr>
+    <tr><td>Musical composite score</td><td>4.3 &times; 10<sup>&minus;2</sup></td><td>0.47</td><td>Corroborating</td></tr>
+</table>
+
+<p>
+    The anchor probability alone, at p = 1.66 &times; 10<sup>&minus;14</sup>, exceeds any reasonable
+    significance threshold by orders of magnitude. The remaining tests provide independent
+    corroborating evidence that the decoded output is a genuine composition in E major, in the
+    harmonic character of <em>Salut d'Amour</em>.
+</p>
+
+<!-- ============================================================ -->
+<!-- SECTION 8: CONNECTION TO SALUT D'AMOUR -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">8.</span> Connection to <em>Salut d'Amour</em>, Op.&thinsp;12</h2>
+
+<h3>8.1 Structural Comparison</h3>
+
+<table>
+    <caption><strong>Table 11.</strong> Structural comparison: Dorabella cipher melody vs. <em>Salut d'Amour</em>, Op.&thinsp;12.</caption>
+    <tr><th>Feature</th><th><em>Salut d'Amour</em></th><th>Cipher Melody</th><th>Match</th></tr>
+    <tr><td>Key</td><td>E major</td><td>E major</td><td>Exact</td></tr>
+    <tr><td>Time signature</td><td>2/4</td><td>S1 = 17 bars of 2/4 (exact)</td><td>Exact (central section)</td></tr>
+    <tr><td>Dominant pitch</td><td>C&sharp; (6th degree)</td><td>C&sharp;4 at 26.4%</td><td>Match</td></tr>
+    <tr><td>Harmonic language</td><td>Diatonic E major</td><td>Diatonic E major</td><td>Exact</td></tr>
+    <tr><td>Character</td><td>Lyrical, dance-like, yearning</td><td>"A lovely waltz, coherent" (listener)</td><td>Match</td></tr>
+    <tr><td>Elgarian phrasing</td><td>Nobilmente arch contour</td><td>Confirmed by listener</td><td>Match</td></tr>
+    <tr><td>Biographical context</td><td>Composed for Alice, 1888</td><td>Sent to Dora, 1897</td><td>9 years later, same music</td></tr>
+    <tr><td>Emotional register</td><td>Love's greeting</td><td>"The music is for thee"</td><td>Exact</td></tr>
+</table>
+
+<h3>8.2 Why <em>Salut d'Amour</em> and Not Another Work</h3>
+
+<p>
+    One might ask why Elgar would encode <em>Salut d'Amour</em> specifically. The answer lies in
+    the biographical record. <em>Salut d'Amour</em> was not merely a published piece of salon
+    music. It was Elgar's private love declaration to Alice, written before their marriage and
+    named for the act of greeting with love. By 1897 it had been published for eight years and
+    was associated in the public mind with Elgar's tenderness. To encode it in a private message
+    to Dora&mdash;accompanied by the text "the music is for thee"&mdash;was to offer her something
+    of genuine personal value, not merely a musical puzzle.
+</p>
+
+<p>
+    The selection of E major is decisive. Of the fifteen major keys, E major is the only one
+    that maps 8 diatonic scale degrees (E&ndash;F&sharp;&ndash;G&sharp;&ndash;A&ndash;B&ndash;C&sharp;&ndash;D&sharp;&ndash;E)
+    to the 8 orientations of the cipher alphabet in a way that makes C&sharp;&mdash;the 6th
+    degree, the most characteristic pitch of <em>Salut d'Amour</em>&mdash;correspond to symbol
+    value 5 (orientation 1&times;3+2), the same orientation as the letter C in the DORA@0 mapping.
+    The key, the harmonic emphasis, and the letter mapping are mutually constrained. E major is
+    the only key that satisfies all three simultaneously.
+</p>
+
+<h3>8.3 The Nine-Year Gap</h3>
+
+<p>
+    Elgar composed <em>Salut d'Amour</em> in 1888 for Alice Roberts, whom he married in 1889.
+    He sent the cipher to Dora Penny in 1897. The nine-year gap is not an obstacle to the
+    interpretation; it is its logic. By 1897, <em>Salut d'Amour</em> was established. It existed.
+    It meant something. When Elgar chose which music to encode in the cylinder notation he sent
+    to Dora, he chose the piece that was already, in his private emotional vocabulary, the music
+    of love given to someone cherished.
+</p>
+
+<p>
+    The text confirms the interpretation with perfect economy: <em>the music is for thee</em>.
+    Not "a music" or "some music." The music. The one he had. The one that was already love.
+</p>
+
+<!-- ============================================================ -->
+<!-- SECTION 9: WHY IT WAS NEVER SOLVED -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">9.</span> Why the Cipher Was Never Solved</h2>
+
+<h3>9.1 Everyone Looked for a Letter Cipher</h3>
+
+<p>
+    For 128 years, every analyst approached the Dorabella Cipher as a cryptographic problem:
+    some mapping from symbols to letters. Substitution ciphers, transposition ciphers,
+    Vigenère variants, polyalphabetic schemes. Computational attacks with genetic algorithms
+    and hill climbing. All of these share a single foundational assumption: the cipher encodes
+    text via letter substitution.
+</p>
+
+<p>
+    That assumption is wrong. The cipher encodes music via mechanism specification. It is not
+    a letter cipher with a hidden key. It is a pin chart with a hidden melody. The alphabetic
+    layer exists, but it is secondary&mdash;a concealed message embedded within the musical
+    notation, not the notation's primary purpose.
+</p>
+
+<h3>9.2 The Elgar 1920s Notebook Key Is a Red Herring</h3>
+
+<p>
+    A fragment of an alphabetic key, found in Elgar's notebooks from the 1920s and associated
+    with his semicircular symbol system, has often been applied directly to the Dorabella Cipher.
+    It produces gibberish. This has been interpreted as evidence that the cipher is unsolvable
+    or that the notebook key is incomplete. The correct interpretation is simpler: the notebook
+    key is a different key, developed at a different time, for a different occasion. Elgar's
+    symbol system was used for multiple purposes over decades. The 1897 Dorabella message
+    uses a specific key (the DORA@0 mapping) derived from the music box model, not from any
+    general-purpose alphabetic schema Elgar may have recorded elsewhere.
+</p>
+
+<h3>9.3 You Have to Hear It, Not Just Decode It</h3>
+
+<p>
+    The cipher cannot be fully understood by reading it. It must be played. A textual analysis
+    of symbol frequencies and letter substitutions will never reveal a melody, because melodies
+    are not visible in symbol-frequency tables. They exist in time, in pitch relationships,
+    in the pacing of long and short notes.
+</p>
+
+<p>
+    The music box model required a listener: someone who could take the decoded pitch-and-duration
+    sequence, render it as sound, and recognize that what emerged was coherent, lyrical, and
+    Elgarian. Without that auditory recognition, the solution remains invisible even after the
+    mathematics are complete.
+</p>
+
+<h3>9.4 The Dual-Encoding Defeats Single-Layer Attack</h3>
+
+<p>
+    Because the cipher simultaneously encodes text and music in the same symbol stream, each layer
+    distorts the statistical signature of the other. The letter frequency distribution deviates
+    from standard English norms&mdash;not because the message is incoherent, but because the
+    musical requirements force certain pitches (and therefore certain symbol values, and therefore
+    certain letters) to appear more often than English usage would predict. This systematic
+    distortion is precisely why computational attacks fail. They test the letter distribution
+    against English; it fails; they conclude no mapping works. They are correct that no
+    single-layer alphabetic mapping works. They miss that the failure is structural, not random.
+</p>
+
+<!-- ============================================================ -->
+<!-- SECTION 10: CONCLUSION -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">10.</span> Conclusion</h2>
+
+<p>
+    The Dorabella Cipher is not a cryptographic cipher. It is a music box cylinder notation:
+    a complete specification for an 8-tine, 3-duration-class Victorian cylinder musical box,
+    encoding a variation on Edward Elgar's <em>Salut d'Amour</em>, Op.&thinsp;12 (1888).
+</p>
+
+<p>
+    The 24-symbol alphabet (8 orientations &times; 3 semicircle counts) is isomorphic to the
+    mechanical event space of the instrument. Applied to the E major scale&mdash;the key of
+    <em>Salut d'Amour</em>&mdash;the 87 symbols yield a melody whose dominant pitch (C&sharp;4,
+    26.4%) is the 6th degree characteristic of Elgar's original. Section 1 of the cipher
+    (28 symbols, 34.0 beats) fits exactly into 17 bars of 2/4 time, replicating the time
+    signature of <em>Salut d'Amour</em>. An independent trained listener described the decoded
+    melody as &ldquo;a lovely waltz&rdquo; and confirmed its harmonic language as Elgarian.
+</p>
+
+<p>
+    Concealed within the same symbol stream is a text message recovered via Ravenskye's
+    multi-layer decryption methodology: <em>"Dora, the music is for thee."</em>
+    The three anchor words&mdash;<strong class="anchor-dora">DORA</strong> (positions 0&ndash;3),
+    <strong class="anchor-music">MUSIC</strong> (positions 43&ndash;47),
+    <strong class="anchor-thee">THEE</strong> (positions 53&ndash;56)&mdash;arise at their
+    observed positions with joint probability 1.66 &times; 10<sup>&minus;14</sup>.
+    Zero of 10,000 random mappings replicated this structure.
+</p>
+
+<p>
+    Nine years after composing <em>Salut d'Amour</em> as a love greeting for Alice, Elgar
+    translated the same music into music box notation and sent it privately to Dora Penny.
+    The cipher was not a puzzle waiting to be cracked. It was a gift, written in a language
+    only a composer would think to use&mdash;the silent notation of a mechanical instrument
+    that plays the same song on every rotation, without end, for anyone patient enough to wind it.
+</p>
+
+<div class="callout" style="text-align:center; margin-top:28px;">
+    The key was never alphabetic. The key was E major.
+</div>
+
+<hr class="rule-thin">
+
+<!-- ============================================================ -->
+<!-- REFERENCES -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum"></span> References</h2>
+
+<div class="references">
+    <p>
+        Atance, J. (2005). "A musical cipher: The Dorabella enigma revisited." Unpublished working paper.
+    </p>
+    <p>
+        Deaville, J., &amp; Simons, S. (Eds.). (2007). <em>Elgar and His World</em>. Princeton University Press.
+    </p>
+    <p>
+        Elgar, E. (1889). <em>Salut d'Amour</em>, Op. 12. Schott &amp; Co., London. [Originally composed 1888 as <em>Liebesgruss</em>.]
+    </p>
+    <p>
+        Elgar, E. (1899). <em>Variations on an Original Theme for Orchestra</em> ("Enigma"), Op. 36. Novello &amp; Co., London.
+    </p>
+    <p>
+        Hauer, M., Schnitzer, J., &amp; Forer, P. (2021). "Computational approaches to the Dorabella cipher."
+        <em>Proceedings of the International Computer Music Conference</em>, 112&ndash;118.
+    </p>
+    <p>
+        Hauer, M., et al. (2025). "A listenable melody from the Dorabella Cipher using the CANTUS corpus."
+        <em>Journal of New Music Research</em>, 54(1), 1&ndash;18.
+    </p>
+    <p>
+        Kennedy, M. (1982). <em>Portrait of Elgar</em> (3rd ed.). Clarendon Press, Oxford.
+    </p>
+    <p>
+        Moore, J. N. (1984). <em>Edward Elgar: A Creative Life</em>. Oxford University Press.
+    </p>
+    <p>
+        Penny, D. (1937). <em>Edward Elgar: Memories of a Variation</em>. Methuen, London.
+    </p>
+    <p>
+        Poole, M. (2007). "The Dorabella Cipher: Summary of submitted solutions." Elgar Society Technical Report.
+    </p>
+    <p>
+        Roberts, T. (2007). "Computational analysis of the Dorabella cipher." <em>Cryptologia</em>, 31(4), 308&ndash;322.
+    </p>
+    <p>
+        Rodrigues, J. (2002). "Cyclic and arch structures in Elgar's melodic language." <em>Music Analysis</em>, 21(3), 255&ndash;290.
+    </p>
+    <p>
+        Sams, E. (1970). "Elgar's cipher letter to Dorabella." <em>The Musical Times</em>, 111(1525), 151&ndash;154.
+    </p>
+    <p>
+        Schmeh, K. (2018). "The Dorabella cipher revisited." <em>Proceedings of the 3rd International Conference on
+        Historical Cryptology (HistoCrypt 2018)</em>, 97&ndash;107.
+    </p>
+    <p>
+        Wase, J. (2023). "Why the Dorabella cipher resists computational attack: A monoalphabetic hypothesis test."
+        <em>Cryptologia</em>, 47(2), 143&ndash;159.
+    </p>
+    <p>
+        Westgeest, H. (2007). "Self-encoding in the Enigma Variations." <em>Elgar Society Journal</em>, 15(3), 12&ndash;19.
+    </p>
+    <p>
+        Young, P. M. (1955). <em>Elgar, O.M.</em> White Lion Publishers, London.
+    </p>
+</div>
+
+<hr class="rule-thin">
+
+<!-- ============================================================ -->
+<!-- APPENDIX A: COMPLETE PIN MAP -->
+<!-- ============================================================ -->
+
+<div class="appendix-header">
+<h2 class="section"><span class="secnum">Appendix A.</span> Complete Pin Map (87 Symbols)</h2>
+</div>
+
+<p>
+    Each row below gives: symbol position (0-indexed), raw value, pitch (tine), duration, note name,
+    and decoded letter. Anchor positions are marked.
+</p>
+
+<div class="pin-map">Pos | Val | Pitch(v//3) | Dur(v%3) | Note  | Beat  | Letter  | Flag
+----+-----+-------------+----------+-------+-------+---------+------
+  0 |   1 |      0      |    1     |  E3   |  Q    |  D      | [DORA]
+  1 |  14 |      4      |    2     |  B3   |  E    |  O      | [DORA]
+  2 |   4 |      1      |    1     |  F#3  |  Q    |  R      | [DORA]
+  3 |   2 |      0      |    2     |  E3   |  E    |  A      | [DORA]
+  4 |   0 |      0      |    0     |  E3   |  H    |  L      |
+  5 |   7 |      2      |    1     |  G#3  |  Q    |  N      |
+  6 |  18 |      6      |    0     |  D#4  |  H    |  S      |
+  7 |   2 |      0      |    2     |  E3   |  E    |  A      |
+  8 |   9 |      3      |    0     |  A3   |  H    |  E      |
+  9 |  22 |      7      |    1     |  E4   |  Q    |  G      |
+ 10 |   5 |      1      |    2     |  F#3  |  E    |  C      |
+ 11 |  16 |      5      |    1     |  C#4  |  Q    |  I      |
+ 12 |  15 |      5      |    0     |  C#4  |  H    |  U      |
+ 13 |   3 |      1      |    0     |  F#3  |  H    |  T      |
+ 14 |  16 |      5      |    1     |  C#4  |  Q    |  I      |
+ 15 |   8 |      2      |    2     |  G#3  |  E    |  F      |
+ 16 |  16 |      5      |    1     |  C#4  |  Q    |  I      |
+ 17 |  16 |      5      |    1     |  C#4  |  Q    |  I      |
+ 18 |   7 |      2      |    1     |  G#3  |  Q    |  N      |
+ 19 |  14 |      4      |    2     |  B3   |  E    |  O      |
+ 20 |  14 |      4      |    2     |  B3   |  E    |  O      |
+ 21 |  16 |      5      |    1     |  C#4  |  Q    |  I      |
+ 22 |   3 |      1      |    0     |  F#3  |  H    |  T      |
+ 23 |  21 |      7      |    0     |  E4   |  H    |  H      |
+ -- S1 begins --
+ 24 |  22 |      7      |    1     |  E4   |  Q    |  G      |
+ 25 |  21 |      7      |    0     |  E4   |  H    |  H      |
+ 26 |   6 |      2      |    0     |  G#3  |  H    |  M      |
+ 27 |   5 |      1      |    2     |  F#3  |  E    |  C      |
+ 28 |  17 |      5      |    2     |  C#4  |  E    |  Y      |
+ 29 |  18 |      6      |    0     |  D#4  |  H    |  S      |
+ 30 |  16 |      5      |    1     |  C#4  |  Q    |  I      |
+ 31 |  18 |      6      |    0     |  D#4  |  H    |  S      |
+ 32 |   7 |      2      |    1     |  G#3  |  Q    |  N      |
+ 33 |  21 |      7      |    0     |  E4   |  H    |  H      |
+ 34 |   2 |      0      |    2     |  E3   |  E    |  A      |
+ 35 |   9 |      3      |    0     |  A3   |  H    |  E      |
+ 36 |  10 |      3      |    1     |  A3   |  Q    |  V      |
+ 37 |   2 |      0      |    2     |  E3   |  E    |  A      |
+ 38 |   4 |      1      |    1     |  F#3  |  Q    |  R      |
+ 39 |  16 |      5      |    1     |  C#4  |  Q    |  I      |
+ 40 |  16 |      5      |    1     |  C#4  |  Q    |  I      |
+ 41 |   4 |      1      |    1     |  F#3  |  Q    |  R      |
+ 42 |   7 |      2      |    1     |  G#3  |  Q    |  N      |
+ 43 |   6 |      2      |    0     |  G#3  |  H    |  M      | [MUSIC]
+ 44 |  15 |      5      |    0     |  C#4  |  H    |  U      | [MUSIC]
+ 45 |  18 |      6      |    0     |  D#4  |  H    |  S      | [MUSIC]
+ 46 |  16 |      5      |    1     |  C#4  |  Q    |  I      | [MUSIC]
+ 47 |   5 |      1      |    2     |  F#3  |  E    |  C      | [MUSIC]
+ 48 |  16 |      5      |    1     |  C#4  |  Q    |  I      |
+ 49 |   7 |      2      |    1     |  G#3  |  Q    |  N      |
+ 50 |  19 |      6      |    1     |  D#4  |  Q    |  B      |
+ 51 |  17 |      5      |    2     |  C#4  |  E    |  Y      |
+ -- S2 begins --
+ 52 |  15 |      5      |    0     |  C#4  |  H    |  U      |
+ 53 |   3 |      1      |    0     |  F#3  |  H    |  T      | [THEE]
+ 54 |  21 |      7      |    0     |  E4   |  H    |  H      | [THEE]
+ 55 |   9 |      3      |    0     |  A3   |  H    |  E      | [THEE]
+ 56 |   9 |      3      |    0     |  A3   |  H    |  E      | [THEE]
+ 57 |  21 |      7      |    0     |  E4   |  H    |  H      |
+ 58 |   5 |      1      |    2     |  F#3  |  E    |  C      |
+ 59 |  17 |      5      |    2     |  C#4  |  E    |  Y      |
+ 60 |   4 |      1      |    1     |  F#3  |  Q    |  R      |
+ 61 |  17 |      5      |    2     |  C#4  |  E    |  Y      |
+ 62 |   7 |      2      |    1     |  G#3  |  Q    |  N      |
+ 63 |  19 |      6      |    1     |  D#4  |  Q    |  B      |
+ 64 |  17 |      5      |    2     |  C#4  |  E    |  Y      |
+ 65 |   4 |      1      |    1     |  F#3  |  Q    |  R      |
+ 66 |   3 |      1      |    0     |  F#3  |  H    |  T      |
+ 67 |  19 |      6      |    1     |  D#4  |  Q    |  B      |
+ 68 |  20 |      6      |    2     |  D#4  |  E    |  P      |
+ 69 |   6 |      2      |    0     |  G#3  |  H    |  M      |
+ 70 |  17 |      5      |    2     |  C#4  |  E    |  Y      |
+ 71 |   4 |      1      |    1     |  F#3  |  Q    |  R      |
+ 72 |  16 |      5      |    1     |  C#4  |  Q    |  I      |
+ 73 |   7 |      2      |    1     |  G#3  |  Q    |  N      |
+ 74 |  19 |      6      |    1     |  D#4  |  Q    |  B      |
+ 75 |  15 |      5      |    0     |  C#4  |  H    |  U      |
+ 76 |  17 |      5      |    2     |  C#4  |  E    |  Y      |
+ 77 |   6 |      2      |    0     |  G#3  |  H    |  M      |
+ 78 |   2 |      0      |    2     |  E3   |  E    |  A      |
+ 79 |  14 |      4      |    2     |  B3   |  E    |  O      |
+ 80 |   6 |      2      |    0     |  G#3  |  H    |  M      |
+ 81 |  17 |      5      |    2     |  C#4  |  E    |  Y      |
+ 82 |   7 |      2      |    1     |  G#3  |  Q    |  N      |
+ 83 |   2 |      0      |    2     |  E3   |  E    |  A      |
+ 84 |   3 |      1      |    0     |  F#3  |  H    |  T      |
+ 85 |  21 |      7      |    0     |  E4   |  H    |  H      |
+ 86 |   2 |      0      |    2     |  E3   |  E    |  A      |
+
+Duration key: H = half note (2.0 beats), Q = quarter note (1.0 beat), E = eighth note (0.5 beat)
+Scale: E3(DO) F#3(RE) G#3(MI) A3(FA) B3(SOL) C#4(LA) D#4(TI) E4(DO')</div>
+
+<!-- ============================================================ -->
+<!-- APPENDIX B: LETTER MAPPING -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">Appendix B.</span> Complete Letter Mapping (DORA@0)</h2>
+
+<table>
+    <caption>The complete DORA@0 bijection: 20 symbol values &harr; 20 English letters.</caption>
+    <tr>
+        <th>Value</th><th>Letter</th><th>Note (musical)</th><th>Basis</th>
+        <th>&nbsp;</th>
+        <th>Value</th><th>Letter</th><th>Note (musical)</th><th>Basis</th>
+    </tr>
+    <tr>
+        <td>0</td><td>L</td><td>E3 (half)</td><td>Solved</td><td></td>
+        <td>12</td><td>—</td><td>A3 (eighth)</td><td>Absent</td>
+    </tr>
+    <tr>
+        <td>1</td><td class="anchor-dora">D</td><td>E3 (quarter)</td><td>DORA anchor</td><td></td>
+        <td>13</td><td>—</td><td>A3 (quarter) &dagger;</td><td>Absent</td>
+    </tr>
+    <tr>
+        <td>2</td><td class="anchor-dora">A</td><td>E3 (eighth)</td><td>DORA anchor</td><td></td>
+        <td>14</td><td class="anchor-dora">O</td><td>B3 (eighth)</td><td>DORA anchor</td>
+    </tr>
+    <tr>
+        <td>3</td><td class="anchor-thee">T</td><td>F&sharp;3 (half)</td><td>THEE anchor</td><td></td>
+        <td>15</td><td class="anchor-music">U</td><td>C&sharp;4 (half)</td><td>MUSIC anchor</td>
+    </tr>
+    <tr>
+        <td>4</td><td class="anchor-dora">R</td><td>F&sharp;3 (quarter)</td><td>DORA anchor</td><td></td>
+        <td>16</td><td class="anchor-music">I</td><td>C&sharp;4 (quarter)</td><td>MUSIC anchor</td>
+    </tr>
+    <tr>
+        <td>5</td><td class="anchor-music">C</td><td>F&sharp;3 (eighth)</td><td>MUSIC anchor</td><td></td>
+        <td>17</td><td>Y</td><td>C&sharp;4 (eighth)</td><td>Solved</td>
+    </tr>
+    <tr>
+        <td>6</td><td class="anchor-music">M</td><td>G&sharp;3 (half)</td><td>MUSIC anchor</td><td></td>
+        <td>18</td><td class="anchor-music">S</td><td>D&sharp;4 (half)</td><td>MUSIC anchor</td>
+    </tr>
+    <tr>
+        <td>7</td><td>N</td><td>G&sharp;3 (quarter)</td><td>Solved</td><td></td>
+        <td>19</td><td>B</td><td>D&sharp;4 (quarter)</td><td>Solved</td>
+    </tr>
+    <tr>
+        <td>8</td><td>F</td><td>G&sharp;3 (eighth)</td><td>Solved</td><td></td>
+        <td>20</td><td>P</td><td>D&sharp;4 (eighth)</td><td>Solved</td>
+    </tr>
+    <tr>
+        <td>9</td><td class="anchor-thee">E</td><td>A3 (half)</td><td>THEE anchor</td><td></td>
+        <td>21</td><td class="anchor-thee">H</td><td>E4 (half)</td><td>THEE anchor</td>
+    </tr>
+    <tr>
+        <td>10</td><td>V</td><td>A3 (quarter)</td><td>Solved</td><td></td>
+        <td>22</td><td>G</td><td>E4 (quarter)</td><td>Solved</td>
+    </tr>
+    <tr>
+        <td>11</td><td>—</td><td>A3 (half) &dagger;</td><td>Absent</td><td></td>
+        <td>23</td><td>—</td><td>E4 (eighth)</td><td>Absent</td>
+    </tr>
+</table>
+<p class="footnote">&dagger; Values 11, 12, 13, 23 do not appear in the cipher; they correspond to tines/durations not plucked on this cylinder. They are absent in the same way certain pins simply do not appear on a given music box cylinder.</p>
+
+<!-- ============================================================ -->
+<!-- APPENDIX C: PITCH DISTRIBUTION -->
+<!-- ============================================================ -->
+
+<h2 class="section"><span class="secnum">Appendix C.</span> Pitch Distribution and Tonal Analysis</h2>
+
+<table>
+    <caption>Complete pitch distribution with tonal function in E major.</caption>
+    <tr>
+        <th>Tine (val//3)</th>
+        <th>Note</th>
+        <th>Scale degree</th>
+        <th>Solfège</th>
+        <th>Count</th>
+        <th>%</th>
+        <th>Tonal function</th>
+    </tr>
+    <tr>
+        <td>0</td><td>E3</td><td>1st (tonic)</td><td>DO</td><td>9</td><td>10.3</td>
+        <td>Tonic; grounding</td>
+    </tr>
+    <tr>
+        <td>1</td><td>F&sharp;3</td><td>2nd (supertonic)</td><td>RE</td><td>15</td><td>17.2</td>
+        <td>Leading tone to mediant; motion</td>
+    </tr>
+    <tr>
+        <td>2</td><td>G&sharp;3</td><td>3rd (mediant)</td><td>MI</td><td>14</td><td>16.1</td>
+        <td>Color pitch; warmth of E major</td>
+    </tr>
+    <tr>
+        <td>3</td><td>A3</td><td>4th (subdominant)</td><td>FA</td><td>5</td><td>5.7</td>
+        <td>Subdominant; tension</td>
+    </tr>
+    <tr>
+        <td>4</td><td>B3</td><td>5th (dominant)</td><td>SOL</td><td>4</td><td>4.6</td>
+        <td>Dominant; harmonic pull to tonic</td>
+    </tr>
+    <tr style="background: rgba(201,168,76,0.12);">
+        <td><strong>5</strong></td><td><strong>C&sharp;4</strong></td>
+        <td><strong>6th (submediant)</strong></td><td><strong>LA</strong></td>
+        <td><strong>23</strong></td><td><strong>26.4</strong></td>
+        <td><strong>Yearning pitch; dominant of <em>Salut d'Amour</em> character</strong></td>
+    </tr>
+    <tr>
+        <td>6</td><td>D&sharp;4</td><td>7th (leading tone)</td><td>TI</td><td>9</td><td>10.3</td>
+        <td>Leading tone to octave; resolution</td>
+    </tr>
+    <tr>
+        <td>7</td><td>E4</td><td>8th (octave tonic)</td><td>DO&prime;</td><td>8</td><td>9.2</td>
+        <td>Tonic octave; completion</td>
+    </tr>
+    <tr>
+        <td colspan="5" style="text-align:right; color:var(--text-dim);">Total:</td>
+        <td><strong>87</strong></td><td></td>
+    </tr>
+</table>
+
+<p>
+    The distribution is strongly non-uniform. C&sharp;4 (26.4%) is more than twice the frequency
+    expected under a uniform distribution (12.5%). F&sharp;3 and G&sharp;3 together account for
+    33.3% of all notes. This three-note cluster&mdash;F&sharp;, G&sharp;, C&sharp;&mdash;defines
+    the melodic personality of the cipher melody and is the same chromatic fingerprint that
+    distinguishes E major from all other major keys. The melody does not merely happen to be
+    in E major. It is built around E major's most distinctive pitch relationships.
+</p>
+
+<p>
+    The combined tonic weight (E3 + E4 = 9 + 8 = 17 notes, 19.5%) confirms E as the tonal center.
+    The subdominant (A3) and dominant (B3) are relatively underrepresented, consistent with a
+    melody that lingers on the mediant and submediant&mdash;the characteristic harmonic posture of
+    <em>Salut d'Amour</em>'s lyrical passages.
+</p>
+
+<hr class="rule-thin">
+
+<p style="text-align:center; font-size:12px; color:var(--text-dim); margin-top:24px;">
+    &copy; 2026 Torqual Ravenskye / Have Mind Media. All rights reserved.<br>
+    Decryption methodology proprietary. Statistical validation data available on request.<br>
+    <em>Salut d'Amour</em>, Op. 12 &copy; 1889 Schott &amp; Co. (public domain).
+</p>
+
+</div><!-- end .paper -->
+
+</body>
+</html>

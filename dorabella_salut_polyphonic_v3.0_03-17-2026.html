@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dorabella — Polyphonic Variation on Salut d'Amour</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  background: #faf6ee; color: #2a2420;
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 30px 20px;
+}
+.header { text-align: center; margin-bottom: 18px; max-width: 720px; }
+.header .ded { font-size: 15px; font-style: italic; color: #8a7a6a; }
+.header h1 { font-size: 36px; letter-spacing: 6px; font-weight: 300; }
+.header .sub { font-size: 17px; font-style: italic; color: #5a4a3a; margin-top: 2px; }
+.header .comp { font-size: 14px; margin-top: 8px; letter-spacing: 2px; }
+.header .comp b { font-weight: 600; }
+.header .dec { font-size: 12px; color: #999; margin-top: 5px; font-style: italic; }
+.header .msg { font-size: 14px; color: #b8956a; margin-top: 8px; letter-spacing: 1px; font-style: italic; }
+
+.controls {
+  display: flex; gap: 8px; align-items: center; margin: 8px 0;
+  flex-wrap: wrap; justify-content: center;
+}
+.bt {
+  font-family: 'Cormorant Garamond', serif; font-size: 14px;
+  padding: 6px 16px; background: #3a3228; color: #faf6ee;
+  border: none; cursor: pointer; border-radius: 2px;
+}
+.bt:hover { background: #5a4a3a; }
+.bt.on { background: #8a6a3a; }
+.tc { display: flex; align-items: center; gap: 5px; font-size: 13px; font-style: italic; color: #6a5a4a; }
+.tc input { width: 85px; accent-color: #8a6a3a; }
+.sep { width: 1px; height: 20px; background: #ccc; }
+.vg { display: flex; gap: 3px; align-items: center; font-size: 11px; color: #8a7a6a; }
+.vg label { min-width: 40px; text-align: right; }
+.vg input { width: 55px; accent-color: #8a6a3a; }
+
+.info { text-align: center; margin: 6px 0 14px; }
+.info .np { font-size: 20px; font-weight: 300; min-height: 28px; }
+.info .si { font-size: 13px; color: #8a7a6a; margin-top: 3px; min-height: 16px; }
+.info .dt {
+  font-size: 15px; color: #5a4a3a; margin-top: 4px;
+  font-family: 'Courier New', monospace; letter-spacing: 2px; min-height: 22px;
+}
+.info .dt .an { color: #b83a2a; font-weight: bold; }
+
+/* Roll */
+.rc {
+  width: 100%; max-width: 920px;
+  background: #f0ebe0; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;
+}
+.rh {
+  display: flex; justify-content: space-between; padding: 5px 10px;
+  background: #e8e0d0; border-bottom: 1px solid #ddd; font-size: 11px; color: #8a7a6a;
+}
+.rw { position: relative; overflow-x: auto; overflow-y: hidden; height: 320px; }
+
+/* Notation */
+.nc { width: 100%; max-width: 920px; margin-top: 10px; }
+.sr {
+  display: flex; align-items: stretch;
+  border-bottom: 1px solid #e8e4da; padding: 10px 0 14px;
+}
+.sr:last-child { border-bottom: none; }
+.bg {
+  display: flex; align-items: flex-end;
+  border-right: 1px solid #aaa; padding: 0 5px;
+  position: relative; min-height: 85px; flex: 1 0 0;
+}
+.bg:last-child { border-right: 3px double #666; }
+.bg .bn { position: absolute; top: -2px; left: 3px; font-size: 9px; color: #bbb; font-style: italic; }
+.bg .mk { position: absolute; top: 8px; left: 3px; font-size: 9px; font-style: italic; color: #8a7a6a; white-space: nowrap; }
+.bg .ch { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #5a8a5a; font-weight: 600; }
+
+.nc2 {
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; margin: 0 2px; flex: 1 0 0;
+}
+.nc2:hover { transform: scale(1.06); }
+.nc2.pl .nh { background: #b83a2a; color: #fff; }
+.nc2.pl .nh.op { border-color: #b83a2a; color: #b83a2a; background: transparent; }
+
+.nh {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 600; font-family: 'Courier New', monospace;
+}
+.nh.fi { background: #2a2420; color: #faf6ee; }
+.nh.op { background: transparent; border: 2px solid #2a2420; color: #2a2420; }
+.nh.sm { width: 20px; height: 20px; font-size: 7px; }
+
+.nl { font-size: 10px; margin-top: 1px; color: #8a7a6a; font-weight: 600; }
+.nl.an { color: #b83a2a; }
+
+.footer {
+  margin-top: 20px; text-align: center; font-size: 12px;
+  color: #aaa; font-style: italic; line-height: 1.7; max-width: 720px;
+}
+.footer b { color: #8a7a6a; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="ded">à Miss Penny</div>
+  <h1>DORABELLA</h1>
+  <div class="sub">Polyphonic Variation on Salut d'Amour, Op. 12</div>
+  <div class="comp"><b>EDWARD ELGAR</b> &middot; 1897</div>
+  <div class="dec">Cipher decoded by Torqual Ravenskye, 2026</div>
+  <div class="msg">"Dora, the music is for thee."</div>
+</div>
+
+<div class="controls">
+  <button class="bt" id="playBtn" onclick="togglePlay()">&#9654; Andantino</button>
+  <button class="bt" onclick="stop()">&#9632;</button>
+  <button class="bt" onclick="restart()">&#8634;</button>
+  <button class="bt" id="loopBtn" onclick="toggleLoop()">&#8635; Loop</button>
+  <div class="sep"></div>
+  <div class="tc">
+    <span>&#9833;=</span>
+    <input type="range" id="tempoS" min="48" max="120" value="72" oninput="setTempo(this.value)">
+    <span id="tempoV">72</span>
+  </div>
+  <div class="sep"></div>
+  <div class="vg"><label>Melody</label><input type="range" id="vM" min="0" max="100" value="85"></div>
+  <div class="vg"><label>Bass</label><input type="range" id="vB" min="0" max="100" value="50"></div>
+  <div class="vg"><label>Chords</label><input type="range" id="vC" min="0" max="100" value="35"></div>
+</div>
+
+<div class="info">
+  <div class="np" id="np">E Major &middot; Andantino</div>
+  <div class="si" id="si">&mdash;</div>
+  <div class="dt" id="dt">&mdash;</div>
+</div>
+
+<div class="rc">
+  <div class="rh">
+    <span>Piano Roll — Melody + Accompaniment</span>
+    <span id="ri">29 bars &middot; 87 notes &middot; E major</span>
+  </div>
+  <div class="rw" id="rw">
+    <canvas id="cv"></canvas>
+  </div>
+</div>
+
+<div class="nc" id="nc"></div>
+
+<div class="footer">
+  <b>87</b> symbols &middot; <b>29</b> bars &middot; <b>3</b> sections &middot; E major<br>
+  Music box cylinder encoding &middot; Violin + Piano<br>
+  <b>DORA</b> &middot; <b>MUSIC</b> &middot; <b>THEE</b>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const S0 = [1,14,4,2,0,7,18,2,9,22,5,16,15,3,16,8,16,16,7,14,14,16,3,21];
+const S1 = [22,21,6,5,17,18,16,18,7,21,2,9,10,2,4,16,16,4,7,6,15,18,16,5,16,7,19,17];
+const S2 = [15,3,21,9,9,21,5,17,4,17,7,19,17,4,3,19,20,6,17,4,16,7,19,15,17,6,2,14,6,17,7,2,3,21,2];
+const FLAT = [...S0, ...S1, ...S2];
+
+const DM = {0:'L',1:'D',2:'A',3:'T',4:'R',5:'C',6:'M',7:'N',8:'F',9:'E',
+            10:'V',14:'O',15:'U',16:'I',17:'Y',18:'S',19:'B',20:'P',21:'H',22:'G'};
+const AM = {};
+[0,1,2,3].forEach(i => AM[i] = 'DORA');
+[43,44,45,46,47].forEach(i => AM[i] = 'MUSIC');
+[53,54,55,56].forEach(i => AM[i] = 'THEE');
+
+// E major — Salut d'Amour key
+const SC = [52,54,56,57,59,61,63,64]; // E3 F#3 G#3 A3 B3 C#4 D#4 E4
+const NN = {40:'E2',42:'F#2',44:'G#2',45:'A2',47:'B2',49:'C#3',
+  52:'E3',54:'F#3',56:'G#3',57:'A3',59:'B3',61:'C#4',63:'D#4',64:'E4'};
+const SN = {52:'E',54:'F#',56:'G#',57:'A',59:'B',61:'C#',63:'D#',64:'E'};
+const DB = {0:2.0, 1:1.0, 2:0.5};
+const DN = {0:'half', 1:'quarter', 2:'eighth'};
+
+// ═══════════════════════════════════════════════════════════════
+// MELODY NOTES
+// ═══════════════════════════════════════════════════════════════
+const notes = FLAT.map((v,i) => {
+  const pi = Math.min(v>>0, 7), p = Math.floor(v/3);
+  const di = v % 3;
+  return {
+    i, v, midi: SC[Math.min(p,7)],
+    name: NN[SC[Math.min(p,7)]]||'?', short: SN[SC[Math.min(p,7)]]||'?',
+    dur: DB[di], durT: DN[di],
+    letter: DM[v]||'?', isA: AM[i]!==undefined, aw: AM[i]||null,
+    sec: i<S0.length?0:(i<S0.length+S1.length?1:2),
+  };
+});
+
+// ═══════════════════════════════════════════════════════════════
+// 29 BARS — 3 notes per bar (natural cipher grouping)
+// ═══════════════════════════════════════════════════════════════
+const bars = [];
+for (let b = 0; b < 29; b++) {
+  const ns = notes.slice(b*3, b*3+3);
+  const beats = ns.reduce((s,n) => s + n.dur, 0);
+  bars.push({ notes: ns, beats });
+}
+
+// Compute absolute beat positions
+let bp = 0;
+bars.forEach(bar => {
+  bar.startBeat = bp;
+  bar.notes.forEach(n => { n.startBeat = bp; bp += n.dur; });
+  bar.endBeat = bp;
+});
+const totalBeats = bp;
+
+// ═══════════════════════════════════════════════════════════════
+// HARMONY — E major voice leading
+// ═══════════════════════════════════════════════════════════════
+const CPC = {
+  'E':   [4,8,11], 'F#m': [6,9,1], 'G#m': [8,11,3],
+  'A':   [9,1,4],  'B':   [11,3,6], 'C#m': [1,4,8], 'B7': [11,3,6,9],
+};
+
+// Proper Elgarian voicings — close position, smooth bass line
+const CV = {
+  'E':   { bass: 40, mid: [47,52], top: [56,59] },      // E2, B2+E3, G#3+B3
+  'F#m': { bass: 42, mid: [49,54], top: [57,61] },      // F#2, C#3+F#3, A3+C#4
+  'G#m': { bass: 44, mid: [47,56], top: [59,63] },      // G#2, B2+G#3, B3+D#4
+  'A':   { bass: 45, mid: [49,52], top: [57,61] },      // A2, C#3+E3, A3+C#4
+  'B':   { bass: 47, mid: [54,59], top: [63] },          // B2, F#3+B3, D#4
+  'C#m': { bass: 49, mid: [52,56], top: [61] },          // C#3, E3+G#3, C#4
+  'B7':  { bass: 47, mid: [51,57], top: [59,63] },      // B2, D#3+A3, B3+D#4
+};
+
+function getChord(pitches) {
+  const pcs = new Set(pitches.map(p => p%12));
+  let best = 'E', bestS = -1;
+  for (const [nm, arr] of Object.entries(CPC)) {
+    let s = 0;
+    arr.forEach(pc => { if (pcs.has(pc)) s++; });
+    if (s > bestS) { bestS = s; best = nm; }
+  }
+  return best;
+}
+
+const barChords = bars.map((bar, i) => {
+  let ch = getChord(bar.notes.map(n => n.midi));
+  if (i === 0 || i === bars.length-1) ch = 'E';
+  if (i === bars.length-2) ch = 'B7';
+  // Smooth dominant approach
+  if (i === bars.length-3 && ch !== 'B' && ch !== 'B7') ch = 'B';
+  return ch;
+});
+
+// ═══════════════════════════════════════════════════════════════
+// ACCOMPANIMENT — Elgarian salon style
+// Bass on beat 1, mid voices on beat 2, top voices on beat 3
+// ═══════════════════════════════════════════════════════════════
+const accomp = [];
+
+bars.forEach((bar, bi) => {
+  const ch = barChords[bi];
+  const c = CV[ch];
+  const bs = bar.startBeat;
+  const dur = bar.beats;
+
+  // How many beats this bar actually has
+  const beatLen = dur;
+
+  if (beatLen >= 2.5) {
+    // Full bar: bass(1) → mid(2) → top(3) — arpeggiated
+    const third = beatLen / 3;
+    accomp.push({ type:'bass', midi: c.bass, start: bs, dur: third * 1.2 });
+    c.mid.forEach(p => accomp.push({ type:'mid', midi: p, start: bs + third, dur: third * 0.9 }));
+    c.top.forEach(p => accomp.push({ type:'top', midi: p, start: bs + third*2, dur: third * 0.9 }));
+  } else if (beatLen >= 1.5) {
+    // Shorter: bass + chord
+    const half = beatLen / 2;
+    accomp.push({ type:'bass', midi: c.bass, start: bs, dur: half });
+    c.mid.forEach(p => accomp.push({ type:'mid', midi: p, start: bs + half, dur: half * 0.85 }));
+    c.top.forEach(p => accomp.push({ type:'top', midi: p, start: bs + half, dur: half * 0.85 }));
+  } else {
+    // Very short: just bass + one chord hit
+    accomp.push({ type:'bass', midi: c.bass, start: bs, dur: beatLen * 0.6 });
+    c.mid.forEach(p => accomp.push({ type:'mid', midi: p, start: bs + beatLen*0.4, dur: beatLen*0.5 }));
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// MARKINGS
+// ═══════════════════════════════════════════════════════════════
+const MK = {
+  0:'p dolce', 4:'cresc.', 7:'p dolciss.', 8:'pp',
+  11:'poco cresc.', 14:'cresc. molto', 16:'dim.',
+  18:'pp', 20:'cresc.', 22:'p a tempo', 24:'dolce',
+  26:'dolciss.', 27:'dim. e rall.', 28:'pp',
+};
+
+// ═══════════════════════════════════════════════════════════════
+// PIANO ROLL
+// ═══════════════════════════════════════════════════════════════
+const cv = document.getElementById('cv');
+const c2 = cv.getContext('2d');
+const rw = document.getElementById('rw');
+
+const NH = 11, BW = 38, LM = 48;
+const MLO = 38, MHI = 66, PR = MHI - MLO;
+
+function drawRoll() {
+  const w = LM + totalBeats * BW + 30;
+  const h = PR * NH + 16;
+  cv.width = w; cv.height = h;
+
+  c2.fillStyle = '#18161e'; c2.fillRect(0,0,w,h);
+
+  // Grid
+  for (let m = MLO; m <= MHI; m++) {
+    const y = (MHI-m)*NH+8;
+    const eScale = [0,2,4,5,7,9,11]; // E major PCs
+    c2.strokeStyle = eScale.includes(m%12) ? '#28263a' : '#1e1c28';
+    c2.beginPath(); c2.moveTo(LM,y); c2.lineTo(w,y); c2.stroke();
+    if (NN[m]) {
+      c2.fillStyle = '#555'; c2.font = '9px monospace';
+      c2.textAlign = 'right'; c2.fillText(NN[m], LM-4, y+3);
+    }
+  }
+
+  // Bar lines
+  bars.forEach((bar, bi) => {
+    const x = LM + bar.startBeat * BW;
+    c2.strokeStyle = '#383848'; c2.lineWidth = 1;
+    c2.beginPath(); c2.moveTo(x,0); c2.lineTo(x,h); c2.stroke();
+    // Bar number
+    c2.fillStyle = '#444'; c2.font = '8px sans-serif'; c2.textAlign = 'center';
+    c2.fillText(bi+1, x+10, 10);
+  });
+
+  // Accompaniment
+  accomp.forEach(a => {
+    const x = LM + a.start * BW;
+    const y = (MHI - a.midi) * NH + 8;
+    const w2 = a.dur * BW;
+    const colors = { bass:'rgba(80,130,80,0.45)', mid:'rgba(70,110,150,0.3)', top:'rgba(100,80,150,0.25)' };
+    c2.fillStyle = colors[a.type] || 'rgba(80,80,80,0.3)';
+    c2.fillRect(x, y-NH/2, w2, NH-1);
+  });
+
+  // Melody
+  notes.forEach(n => {
+    const x = LM + n.startBeat * BW;
+    const y = (MHI - n.midi) * NH + 8;
+    const w2 = n.dur * BW;
+
+    if (n.isA) c2.fillStyle = '#b83a2a';
+    else c2.fillStyle = ['#c4a35a','#8ab45a','#5aa0c4'][n.sec];
+
+    // Rounded rect
+    const r = 3;
+    c2.beginPath();
+    c2.moveTo(x+r, y-NH/2);
+    c2.lineTo(x+w2-r, y-NH/2);
+    c2.quadraticCurveTo(x+w2, y-NH/2, x+w2, y-NH/2+r);
+    c2.lineTo(x+w2, y+NH/2-1-r);
+    c2.quadraticCurveTo(x+w2, y+NH/2-1, x+w2-r, y+NH/2-1);
+    c2.lineTo(x+r, y+NH/2-1);
+    c2.quadraticCurveTo(x, y+NH/2-1, x, y+NH/2-1-r);
+    c2.lineTo(x, y-NH/2+r);
+    c2.quadraticCurveTo(x, y-NH/2, x+r, y-NH/2);
+    c2.fill();
+
+    if (w2 > 12) {
+      c2.fillStyle = '#fff'; c2.font = 'bold 8px monospace'; c2.textAlign = 'center';
+      c2.fillText(n.letter, x+w2/2, y+3);
+    }
+  });
+}
+drawRoll();
+
+// Playhead
+const ph = document.createElement('div');
+ph.style.cssText = 'position:absolute;top:0;bottom:0;width:2px;background:#ff4444;z-index:10;display:none;pointer-events:none;';
+rw.appendChild(ph);
+
+// ═══════════════════════════════════════════════════════════════
+// NOTATION
+// ═══════════════════════════════════════════════════════════════
+const nc = document.getElementById('nc');
+const BPS = 6;
+
+for (let s = 0; s < bars.length; s += BPS) {
+  const end = Math.min(s+BPS, bars.length);
+  const row = document.createElement('div');
+  row.className = 'sr';
+
+  for (let b = s; b < end; b++) {
+    const bar = bars[b];
+    const el = document.createElement('div');
+    el.className = 'bg';
+
+    const bn = document.createElement('div');
+    bn.className = 'bn'; bn.textContent = b+1;
+    el.appendChild(bn);
+
+    if (MK[b]) {
+      const mk = document.createElement('div');
+      mk.className = 'mk'; mk.textContent = MK[b];
+      el.appendChild(mk);
+    }
+
+    const chl = document.createElement('div');
+    chl.className = 'ch'; chl.textContent = barChords[b];
+    el.appendChild(chl);
+
+    bar.notes.forEach(n => {
+      const cell = document.createElement('div');
+      cell.className = 'nc2';
+      cell.id = `n${n.i}`;
+      cell.onclick = () => preview(n);
+
+      const hd = document.createElement('div');
+      const isH = n.durT === 'half', isE = n.durT === 'eighth';
+      hd.className = `nh ${isH?'op':'fi'} ${isE?'sm':''}`;
+      hd.textContent = n.short;
+      cell.appendChild(hd);
+
+      const lt = document.createElement('div');
+      lt.className = `nl ${n.isA?'an':''}`;
+      lt.textContent = n.letter;
+      cell.appendChild(lt);
+
+      el.appendChild(cell);
+    });
+    row.appendChild(el);
+  }
+  nc.appendChild(row);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIO — Music box melody + warm piano accompaniment
+// ═══════════════════════════════════════════════════════════════
+let actx = null, playing = false, sources = [], af = null;
+let pst = 0, psb = 0, tempo = 72, looping = false;
+
+function ac() { if (!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); return actx; }
+function fr(m) { return 440 * Math.pow(2,(m-69)/12); }
+function b2s(b) { return b*60/tempo; }
+function gv(id) { return document.getElementById(id).value/100; }
+
+// ── Music box melody timbre ──
+function sMel(ctx, midi, t, dur, vol) {
+  const f = fr(midi);
+  const v = vol * 0.18;
+
+  // Fundamental — triangle for music box
+  const o1 = ctx.createOscillator(); o1.type = 'triangle'; o1.frequency.value = f;
+  const g1 = ctx.createGain();
+  o1.connect(g1); g1.connect(ctx.destination);
+
+  // 2nd harmonic — body
+  const o2 = ctx.createOscillator(); o2.type = 'sine'; o2.frequency.value = f*2;
+  const g2 = ctx.createGain();
+  o2.connect(g2); g2.connect(ctx.destination);
+
+  // 3rd — ring
+  const o3 = ctx.createOscillator(); o3.type = 'sine'; o3.frequency.value = f*3;
+  const g3 = ctx.createGain();
+  o3.connect(g3); g3.connect(ctx.destination);
+
+  // 5th — sparkle
+  const o5 = ctx.createOscillator(); o5.type = 'sine'; o5.frequency.value = f*5;
+  const g5 = ctx.createGain();
+  o5.connect(g5); g5.connect(ctx.destination);
+
+  // Vibrato
+  const vib = ctx.createOscillator(); vib.frequency.value = 5;
+  const vg = ctx.createGain(); vg.gain.value = 1.5;
+  vib.connect(vg); vg.connect(o1.frequency);
+
+  // Envelope
+  g1.gain.setValueAtTime(0,t);
+  g1.gain.linearRampToValueAtTime(v, t+0.01);
+  g1.gain.exponentialRampToValueAtTime(v*0.55, t+dur*0.35);
+  g1.gain.linearRampToValueAtTime(v*0.35, t+dur*0.8);
+  g1.gain.linearRampToValueAtTime(0.001, t+dur);
+
+  g2.gain.setValueAtTime(0,t);
+  g2.gain.linearRampToValueAtTime(v*0.22, t+0.008);
+  g2.gain.exponentialRampToValueAtTime(0.001, t+dur*0.5);
+
+  g3.gain.setValueAtTime(0,t);
+  g3.gain.linearRampToValueAtTime(v*0.1, t+0.005);
+  g3.gain.exponentialRampToValueAtTime(0.001, t+dur*0.35);
+
+  g5.gain.setValueAtTime(0,t);
+  g5.gain.linearRampToValueAtTime(v*0.05, t+0.003);
+  g5.gain.exponentialRampToValueAtTime(0.001, t+dur*0.2);
+
+  const e = t+dur+0.15;
+  [o1,o2,o3,o5,vib].forEach(o => { o.start(t); o.stop(e); sources.push(o); });
+}
+
+// ── Piano bass ──
+function sBas(ctx, midi, t, dur, vol) {
+  const f = fr(midi);
+  const v = vol * 0.13;
+
+  const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+  const o2 = ctx.createOscillator(); o2.type = 'sine'; o2.frequency.value = f*2;
+  const g = ctx.createGain(); const g2 = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o2.connect(g2); g2.connect(ctx.destination);
+
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(v, t+0.012);
+  g.gain.exponentialRampToValueAtTime(v*0.25, t+dur*0.6);
+  g.gain.linearRampToValueAtTime(0.001, t+dur);
+
+  g2.gain.setValueAtTime(0,t);
+  g2.gain.linearRampToValueAtTime(v*0.12, t+0.008);
+  g2.gain.linearRampToValueAtTime(0.001, t+dur*0.4);
+
+  [o,o2].forEach(x => { x.start(t); x.stop(t+dur+0.1); sources.push(x); });
+}
+
+// ── Piano chord voices ──
+function sCh(ctx, midi, t, dur, vol) {
+  const f = fr(midi);
+  const v = vol * 0.07;
+
+  const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+  const g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(v, t+0.006);
+  g.gain.exponentialRampToValueAtTime(v*0.15, t+dur*0.7);
+  g.gain.linearRampToValueAtTime(0.001, t+dur);
+
+  o.start(t); o.stop(t+dur+0.1); sources.push(o);
+}
+
+function preview(n) {
+  sMel(ac(), n.midi, ac().currentTime, b2s(n.dur), gv('vM'));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PLAYBACK
+// ═══════════════════════════════════════════════════════════════
+function schedAll(from) {
+  const ctx = ac();
+  const now = ctx.currentTime;
+  pst = now; psb = from;
+
+  const vm = gv('vM'), vb = gv('vB'), vc = gv('vC');
+
+  notes.forEach(n => {
+    if (n.startBeat >= from) {
+      sMel(ctx, n.midi, now + b2s(n.startBeat-from), b2s(n.dur), vm);
+    }
+  });
+
+  accomp.forEach(a => {
+    if (a.start >= from) {
+      const t = now + b2s(a.start-from);
+      const d = b2s(a.dur);
+      if (a.type === 'bass') sBas(ctx, a.midi, t, d, vb);
+      else sCh(ctx, a.midi, t, d, vc);
+    }
+  });
+}
+
+let _lh = -1;
+
+function anim() {
+  if (!playing) return;
+  const ctx = ac();
+  const el = ctx.currentTime - pst;
+  const cb = psb + (el*tempo)/60;
+
+  if (cb >= totalBeats) {
+    if (looping) {
+      killSrc();
+      schedAll(0);
+      _lh = -1;
+    } else {
+      stop();
+      return;
+    }
+  }
+
+  // Playhead
+  const x = LM + cb * BW;
+  ph.style.left = x+'px'; ph.style.display = 'block';
+  const ww = rw.clientWidth;
+  if (x > rw.scrollLeft + ww*0.65) rw.scrollLeft = x - ww*0.3;
+
+  // Highlight
+  let cur = -1;
+  for (let i = 0; i < notes.length; i++) {
+    if (notes[i].startBeat <= cb && notes[i].startBeat + notes[i].dur > cb) { cur = i; break; }
+  }
+  if (cur >= 0 && cur !== _lh) {
+    _lh = cur;
+    hl(cur);
+  }
+
+  af = requestAnimationFrame(anim);
+}
+
+function hl(idx) {
+  document.querySelectorAll('.nc2.pl').forEach(e => e.classList.remove('pl'));
+  const el = document.getElementById(`n${idx}`);
+  if (el) { el.classList.add('pl'); el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}); }
+  const n = notes[idx];
+  const sn = ['I','II','III'];
+  document.getElementById('np').textContent =
+    `${n.name} — ${n.durT}${n.isA?' — '+n.aw:''} — Section ${sn[n.sec]}`;
+
+  const bi = Math.floor(idx/3);
+  document.getElementById('si').textContent =
+    `Note ${idx+1}/87 · Bar ${bi+1}/29 · ${barChords[bi]}`;
+
+  // Decoded text
+  const dtE = document.getElementById('dt');
+  const st = Math.max(0, idx-35);
+  let h = '';
+  for (let i = st; i <= idx; i++) {
+    const lt = notes[i].letter;
+    h += notes[i].isA ? `<span class="an">${lt}</span>` : lt;
+  }
+  dtE.innerHTML = h;
+}
+
+function togglePlay() {
+  if (playing) {
+    killSrc(); playing = false;
+    if (af) cancelAnimationFrame(af);
+    ph.style.display = 'none';
+    document.getElementById('playBtn').textContent = '▶ Andantino';
+  } else {
+    playing = true; _lh = -1;
+    document.getElementById('playBtn').textContent = '⏸ Pause';
+    schedAll(0); anim();
+  }
+}
+
+function stop() {
+  killSrc(); playing = false;
+  if (af) cancelAnimationFrame(af);
+  ph.style.display = 'none'; _lh = -1;
+  document.querySelectorAll('.nc2.pl').forEach(e => e.classList.remove('pl'));
+  document.getElementById('playBtn').textContent = '▶ Andantino';
+  document.getElementById('np').textContent = 'E Major · Andantino';
+  document.getElementById('si').textContent = '—';
+  document.getElementById('dt').textContent = '—';
+}
+
+function restart() {
+  stop();
+  setTimeout(() => { playing = true; _lh = -1;
+    document.getElementById('playBtn').textContent = '⏸ Pause';
+    schedAll(0); anim();
+  }, 80);
+}
+
+function toggleLoop() {
+  looping = !looping;
+  document.getElementById('loopBtn').classList.toggle('on', looping);
+}
+
+function killSrc() { sources.forEach(s => { try{s.stop();}catch(e){} }); sources = []; }
+
+function setTempo(v) {
+  tempo = parseInt(v);
+  document.getElementById('tempoV').textContent = v;
+  if (playing) {
+    const ctx = ac();
+    const el = ctx.currentTime - pst;
+    const cb = psb + (el*tempo)/60;
+    killSrc();
+    schedAll(Math.min(cb, totalBeats-0.5));
+  }
+}
+</script>
+</body>
+</html>
