@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dorabella Cipher — Salut d'Amour Format</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background: #f5f0e8;
+  color: #2a2a2a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+.score-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.score-header h1 {
+  font-size: 28px;
+  letter-spacing: 4px;
+  margin-bottom: 2px;
+}
+.score-header .subtitle {
+  font-size: 18px;
+  font-style: italic;
+  margin-bottom: 8px;
+}
+.score-header .dedication {
+  font-size: 14px;
+  font-style: italic;
+  color: #666;
+}
+.score-header .composer {
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+.score-header .opus {
+  font-size: 14px;
+}
+.score-header .decoder {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 15px 0;
+}
+.controls button {
+  font-family: Georgia, serif;
+  font-size: 15px;
+  padding: 8px 24px;
+  background: #3a3a3a;
+  color: #f5f0e8;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+.controls button:hover { background: #555; }
+.controls .tempo-label {
+  font-size: 14px;
+  font-style: italic;
+}
+.controls input[type=range] {
+  width: 120px;
+}
+
+.staff-container {
+  width: 100%;
+  max-width: 900px;
+  overflow-x: auto;
+}
+
+.notation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 0;
+  padding: 10px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.bar {
+  display: inline-flex;
+  align-items: flex-end;
+  border-right: 1px solid #999;
+  padding: 4px 6px;
+  min-height: 90px;
+  position: relative;
+}
+.bar:last-child {
+  border-right: 3px double #333;
+}
+.bar.section-start::before {
+  content: attr(data-section);
+  position: absolute;
+  top: 0;
+  left: 2px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+.bar .marking {
+  position: absolute;
+  top: 14px;
+  left: 4px;
+  font-size: 10px;
+  font-style: italic;
+  color: #666;
+  white-space: nowrap;
+}
+
+.note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 2px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.note:hover { transform: scale(1.1); }
+.note.playing {
+  transform: scale(1.2);
+}
+.note.playing .note-head {
+  background: #c0392b;
+  color: white;
+}
+
+.note-head {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+.note-head.half {
+  background: transparent;
+  border: 2px solid #2a2a2a;
+  color: #2a2a2a;
+}
+.note-head.half.playing {
+  border-color: #c0392b;
+  color: #c0392b;
+}
+.note-head.eighth {
+  width: 24px;
+  height: 24px;
+  font-size: 8px;
+}
+
+.note .letter {
+  font-size: 11px;
+  margin-top: 2px;
+  color: #666;
+  font-weight: bold;
+}
+.note .letter.anchor {
+  color: #c0392b;
+  font-size: 12px;
+}
+
+.note .dynamic {
+  font-size: 9px;
+  font-style: italic;
+  color: #888;
+  margin-top: 1px;
+}
+
+.info {
+  margin-top: 15px;
+  max-width: 900px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #555;
+}
+.info .now-playing {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2a2a2a;
+  text-align: center;
+  min-height: 28px;
+}
+.stats {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 8px;
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+
+<div class="score-header">
+  <div class="dedication">à Carice</div>
+  <h1>SALUT D'AMOUR</h1>
+  <div class="subtitle">(Liebesgruss.)</div>
+  <div class="subtitle" style="font-size:13px; margin-top:4px;">Decoded from Elgar's Dorabella Cipher (1897)</div>
+  <div class="composer">EDWARD ELGAR.</div>
+  <div class="opus">Op. 12.</div>
+  <div class="decoder">Cipher decoded by Torqual Ravenskye, 2026</div>
+</div>
+
+<div class="controls">
+  <button id="playBtn" onclick="togglePlay()">▶ Andantino</button>
+  <button onclick="stop()">■ Stop</button>
+  <span class="tempo-label">♩ = </span>
+  <input type="range" id="tempoSlider" min="50" max="120" value="72" oninput="updateTempo(this.value)">
+  <span id="tempoVal" class="tempo-label">72</span>
+</div>
+
+<div class="info">
+  <div class="now-playing" id="nowPlaying">E Major · 2/4 · Andantino</div>
+  <div class="stats">
+    <span id="posInfo">—</span>
+    <span id="wordInfo">—</span>
+  </div>
+</div>
+
+<div class="staff-container">
+  <div class="notation" id="notation"></div>
+</div>
+
+<div class="info" style="margin-top:20px; text-align:center; font-style:italic;">
+  87 symbols · 29 phrases · E major · Violin &amp; Piano<br>
+  Anchor words: <span style="color:#c0392b; font-weight:bold;">DORA</span> ·
+  <span style="color:#c0392b; font-weight:bold;">MUSIC</span> ·
+  <span style="color:#c0392b; font-weight:bold;">THEE</span>
+</div>
+
+<script>
+// ── Cipher Data ──
+const S0 = [1,14,4,2,0,7,18,2,9,22,5,16,15,3,16,8,16,16,7,14,14,16,3,21,22,21,6,5,17];
+const S1 = [18,16,18,7,21,2,9,10,2,4,16,16,4,7,6,15,18,16,5,16,7,19,17,15,3];
+const S2 = [21,9,9,21,5,17,4,17,7,19,17,4,3,19,20,6,17,4,16,7,19,15,17,6,2,14,6,17,7,2,3,21,2];
+const FLAT = [...S0, ...S1, ...S2];
+
+// E major scale (transposed from G major down minor 3rd)
+const E_MAJOR = [52, 54, 56, 57, 59, 61, 63, 64]; // E3 F#3 G#3 A3 B3 C#4 D#4 E4
+const NOTE_NAMES = {52:'E3',54:'F#3',56:'G#3',57:'A3',59:'B3',61:'C#4',63:'D#4',64:'E4'};
+const DUR_MAP = {0: 2.0, 1: 1.0, 2: 0.5}; // half, quarter, eighth
+const DUR_NAMES = {0: 'half', 1: 'quarter', 2: 'eighth'};
+
+// Letter mapping (DORA_MAP)
+const DORA_MAP = {0:'L',1:'D',2:'A',3:'T',4:'R',5:'C',6:'M',7:'N',8:'F',9:'E',
+                  10:'V',14:'O',15:'U',16:'I',17:'Y',18:'S',19:'B',20:'P',21:'H',22:'G'};
+
+// Anchor word positions
+const ANCHORS = {};
+// DORA: pos 0-3
+[0,1,2,3].forEach(i => ANCHORS[i] = 'DORA');
+// MUSIC: pos 43-47
+[43,44,45,46,47].forEach(i => ANCHORS[i] = 'MUSIC');
+// THEE: pos 53-56
+[53,54,55,56].forEach(i => ANCHORS[i] = 'THEE');
+
+// Salut d'Amour structure — map cipher phrases to Salut sections
+// Salut sections: intro, A (pp middle), B Tempo, C Tempo, D (dolciss), E (accel), F (più lento), G Tempo
+const SECTIONS = {
+  0:  {label:'', marking:'p dolce legatiss.'},
+  3:  {label:'', marking:''},
+  6:  {label:'', marking:'cresc.'},
+  9:  {label:'', marking:'sf'},
+  10: {label:'', marking:'p dolciss.'},
+  12: {label:'A', marking:'pp'},
+  15: {label:'', marking:'poco cresc.'},
+  17: {label:'', marking:'p cresc. molto'},
+  18: {label:'', marking:'sf'},
+  19: {label:'', marking:'dim.'},
+  20: {label:'B', marking:'pp poco rit.'},
+  22: {label:'', marking:'cresc. molto'},
+  23: {label:'', marking:'rit.'},
+  24: {label:'C', marking:'p'},
+  26: {label:'', marking:'dolce'},
+  27: {label:'D', marking:'p dolciss.'},
+  28: {label:'', marking:'dim.'},
+};
+
+// Build note data
+const notes = FLAT.map((val, i) => ({
+  index: i,
+  value: val,
+  midi: E_MAJOR[Math.floor(val / 3)],
+  noteName: NOTE_NAMES[E_MAJOR[Math.floor(val / 3)]],
+  durBeats: DUR_MAP[val % 3],
+  durType: DUR_NAMES[val % 3],
+  letter: DORA_MAP[val] || '?',
+  isAnchor: i in ANCHORS,
+  anchorWord: ANCHORS[i] || null,
+  bar: Math.floor(i / 3),
+}));
+
+// ── Build Notation Display ──
+const notationEl = document.getElementById('notation');
+
+// Group by bars (3 notes per bar)
+for (let bar = 0; bar < 29; bar++) {
+  const barEl = document.createElement('div');
+  barEl.className = 'bar';
+
+  const section = SECTIONS[bar];
+  if (section && section.label) {
+    barEl.classList.add('section-start');
+    barEl.dataset.section = section.label;
+  }
+  if (section && section.marking) {
+    const markEl = document.createElement('div');
+    markEl.className = 'marking';
+    markEl.textContent = section.marking;
+    barEl.appendChild(markEl);
+  }
+
+  for (let j = 0; j < 3; j++) {
+    const idx = bar * 3 + j;
+    if (idx >= notes.length) break;
+    const n = notes[idx];
+
+    const noteEl = document.createElement('div');
+    noteEl.className = 'note';
+    noteEl.id = `note-${idx}`;
+    noteEl.onclick = () => playNote(n.midi, n.durBeats);
+
+    const head = document.createElement('div');
+    head.className = `note-head ${n.durType}`;
+    head.textContent = n.noteName.replace(/[0-9]/g,'');
+    noteEl.appendChild(head);
+
+    const letter = document.createElement('div');
+    letter.className = `letter ${n.isAnchor ? 'anchor' : ''}`;
+    letter.textContent = n.letter;
+    noteEl.appendChild(letter);
+
+    barEl.appendChild(noteEl);
+  }
+
+  notationEl.appendChild(barEl);
+}
+
+// ── Audio Engine ──
+let audioCtx = null;
+let playing = false;
+let currentTimeout = null;
+let currentNote = -1;
+let tempo = 72;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function midiToFreq(midi) {
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+function playNote(midi, durBeats) {
+  const ctx = getAudioCtx();
+  const dur = (durBeats * 60) / tempo;
+
+  // Main tone (violin-like)
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const vibrato = ctx.createOscillator();
+  const vibGain = ctx.createGain();
+
+  // Vibrato
+  vibrato.frequency.value = 5.5;
+  vibGain.gain.value = 2;
+  vibrato.connect(vibGain);
+  vibGain.connect(osc.frequency);
+
+  osc.type = 'triangle';
+  osc.frequency.value = midiToFreq(midi);
+
+  // Second harmonic for warmth
+  const osc2 = ctx.createOscillator();
+  const gain2 = ctx.createGain();
+  osc2.type = 'sine';
+  osc2.frequency.value = midiToFreq(midi) * 2;
+  gain2.gain.value = 0.15;
+  osc2.connect(gain2);
+  gain2.connect(ctx.destination);
+
+  // Envelope — warm, singing tone
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.06);
+  gain.gain.linearRampToValueAtTime(0.14, ctx.currentTime + dur * 0.3);
+  gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + dur * 0.8);
+  gain.gain.linearRampToValueAtTime(0, ctx.currentTime + dur);
+
+  gain2.gain.setValueAtTime(0, ctx.currentTime);
+  gain2.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.06);
+  gain2.gain.linearRampToValueAtTime(0, ctx.currentTime + dur);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(ctx.currentTime);
+  osc2.start(ctx.currentTime);
+  vibrato.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + dur + 0.05);
+  osc2.stop(ctx.currentTime + dur + 0.05);
+  vibrato.stop(ctx.currentTime + dur + 0.05);
+}
+
+function highlightNote(idx) {
+  // Clear previous
+  document.querySelectorAll('.note.playing').forEach(el => el.classList.remove('playing'));
+  if (idx >= 0 && idx < notes.length) {
+    const el = document.getElementById(`note-${idx}`);
+    if (el) {
+      el.classList.add('playing');
+      el.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+    }
+    const n = notes[idx];
+    document.getElementById('nowPlaying').textContent =
+      `${n.noteName} — ${n.letter}${n.isAnchor ? ' [' + n.anchorWord + ']' : ''}`;
+    document.getElementById('posInfo').textContent = `Note ${idx+1}/87 · Bar ${n.bar+1}/29`;
+
+    // Show decoded text so far
+    const decoded = notes.slice(0, idx+1).map(x => x.letter).join('');
+    document.getElementById('wordInfo').textContent = decoded.slice(Math.max(0, idx-15));
+  }
+}
+
+function playSequence(startIdx) {
+  if (!playing || startIdx >= notes.length) {
+    stop();
+    return;
+  }
+  currentNote = startIdx;
+  const n = notes[startIdx];
+  playNote(n.midi, n.durBeats);
+  highlightNote(startIdx);
+
+  const durMs = (n.durBeats * 60 * 1000) / tempo;
+  currentTimeout = setTimeout(() => playSequence(startIdx + 1), durMs);
+}
+
+function togglePlay() {
+  if (playing) {
+    stop();
+  } else {
+    playing = true;
+    document.getElementById('playBtn').textContent = '⏸ Pause';
+    playSequence(currentNote >= 0 ? currentNote : 0);
+  }
+}
+
+function stop() {
+  playing = false;
+  if (currentTimeout) clearTimeout(currentTimeout);
+  currentTimeout = null;
+  currentNote = -1;
+  document.getElementById('playBtn').textContent = '▶ Andantino';
+  document.querySelectorAll('.note.playing').forEach(el => el.classList.remove('playing'));
+  document.getElementById('nowPlaying').textContent = 'E Major · 2/4 · Andantino';
+  document.getElementById('posInfo').textContent = '—';
+  document.getElementById('wordInfo').textContent = '—';
+}
+
+function updateTempo(val) {
+  tempo = parseInt(val);
+  document.getElementById('tempoVal').textContent = val;
+}
+</script>
+
+</body>
+</html>

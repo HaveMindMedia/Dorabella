@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dorabella — Polyphonic Salut d'Amour Variation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  background: #faf6ee; color: #2a2420;
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 30px 20px;
+}
+
+.score-header { text-align: center; margin-bottom: 20px; max-width: 720px; }
+.score-header .dedication { font-size: 15px; font-style: italic; color: #8a7a6a; }
+.score-header h1 { font-size: 36px; letter-spacing: 6px; font-weight: 300; }
+.score-header .subtitle { font-size: 17px; font-style: italic; color: #5a4a3a; margin-top: 2px; }
+.score-header .opus-line { font-size: 14px; margin-top: 8px; letter-spacing: 2px; }
+.score-header .composer { font-weight: 600; }
+.score-header .decoder { font-size: 12px; color: #999; margin-top: 6px; font-style: italic; }
+.score-header .message { font-size: 14px; color: #b8956a; margin-top: 8px; letter-spacing: 1px; font-style: italic; }
+
+.controls {
+  display: flex; gap: 10px; align-items: center; margin: 10px 0;
+  flex-wrap: wrap; justify-content: center;
+}
+.btn {
+  font-family: 'Cormorant Garamond', serif; font-size: 14px;
+  padding: 6px 18px; background: #3a3228; color: #faf6ee;
+  border: none; cursor: pointer; letter-spacing: 1px; border-radius: 2px;
+  transition: background 0.2s;
+}
+.btn:hover { background: #5a4a3a; }
+.btn.active { background: #8a6a3a; }
+.btn.small { font-size: 12px; padding: 4px 10px; }
+
+.tempo-ctrl { display: flex; align-items: center; gap: 5px; font-size: 13px; font-style: italic; color: #6a5a4a; }
+.tempo-ctrl input { width: 90px; accent-color: #8a6a3a; }
+
+.sep { width: 1px; height: 22px; background: #ccc; margin: 0 4px; }
+
+.vol-group { display: flex; gap: 4px; align-items: center; font-size: 11px; color: #8a7a6a; }
+.vol-group label { min-width: 44px; text-align: right; }
+.vol-group input { width: 60px; accent-color: #8a6a3a; }
+
+.info-panel { text-align: center; margin: 6px 0 14px; max-width: 720px; }
+.now-playing { font-size: 20px; font-weight: 300; min-height: 28px; color: #3a3228; }
+.sub-info { font-size: 13px; color: #8a7a6a; margin-top: 3px; min-height: 18px; }
+.decoded-text {
+  font-size: 15px; color: #5a4a3a; margin-top: 4px;
+  font-family: 'Courier New', monospace; letter-spacing: 2px; min-height: 22px;
+}
+.decoded-text .anchor { color: #b83a2a; font-weight: bold; }
+
+/* ── Piano Roll ── */
+.roll-container {
+  width: 100%; max-width: 900px;
+  background: #f0ebe0; border: 1px solid #ddd; border-radius: 4px;
+  overflow: hidden; position: relative;
+}
+.roll-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 12px; background: #e8e0d0; border-bottom: 1px solid #ddd;
+  font-size: 11px; color: #8a7a6a;
+}
+.roll-wrap {
+  position: relative; overflow-x: auto; overflow-y: hidden;
+  height: 340px;
+}
+.roll-canvas { display: block; }
+
+/* ── Notation Row (below roll) ── */
+.notation-container {
+  width: 100%; max-width: 900px; margin-top: 10px;
+}
+.system-row {
+  display: flex; align-items: stretch;
+  border-bottom: 1px solid #e0ddd5; padding: 8px 0 6px;
+}
+.system-row:last-child { border-bottom: none; }
+.bar-group {
+  display: flex; align-items: flex-end;
+  border-right: 1px solid #aaa; padding: 0 6px;
+  position: relative; min-height: 80px;
+}
+.bar-group:last-child { border-right: 3px double #666; }
+.bar-group .bar-num {
+  position: absolute; top: -2px; left: 3px;
+  font-size: 9px; color: #bbb; font-style: italic;
+}
+.bar-group .marking {
+  position: absolute; top: 8px; left: 3px;
+  font-size: 9px; font-style: italic; color: #8a7a6a; white-space: nowrap;
+}
+.bar-group .chord-label {
+  position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; color: #6a8a5a; font-weight: 600;
+}
+
+.note-cell {
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; transition: transform 0.08s; margin: 0 1px;
+}
+.note-cell:hover { transform: scale(1.06); }
+.note-cell.playing .nhead { background: #b83a2a; color: #fff; }
+.note-cell.playing .nhead.open { border-color: #b83a2a; color: #b83a2a; background: transparent; }
+
+.nhead {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 600; font-family: 'Courier New', monospace;
+}
+.nhead.filled { background: #2a2420; color: #faf6ee; }
+.nhead.open { background: transparent; border: 2px solid #2a2420; color: #2a2420; }
+.nhead.small { width: 20px; height: 20px; font-size: 7px; }
+
+.nletter { font-size: 10px; margin-top: 1px; color: #8a7a6a; font-weight: 600; }
+.nletter.anchor { color: #b83a2a; }
+
+.footer {
+  margin-top: 20px; text-align: center; font-size: 12px;
+  color: #aaa; font-style: italic; max-width: 720px; line-height: 1.7;
+}
+.footer b { color: #8a7a6a; }
+</style>
+</head>
+<body>
+
+<div class="score-header">
+  <div class="dedication">à Miss Penny</div>
+  <h1>DORABELLA</h1>
+  <div class="subtitle">Polyphonic Variation on Salut d'Amour, Op. 12</div>
+  <div class="opus-line"><span class="composer">EDWARD ELGAR</span> &middot; 1897</div>
+  <div class="decoder">Cipher decoded by Torqual Ravenskye, 2026</div>
+  <div class="message">"Dora, the music is for thee."</div>
+</div>
+
+<div class="controls">
+  <button class="btn" id="playBtn" onclick="togglePlay()">&#9654; Andantino</button>
+  <button class="btn" onclick="stop()">&#9632;</button>
+  <button class="btn" onclick="restart()">&#8634;</button>
+  <div class="sep"></div>
+  <div class="tempo-ctrl">
+    <span>&#9833;=</span>
+    <input type="range" id="tempoSlider" min="48" max="108" value="72" oninput="updateTempo(this.value)">
+    <span id="tempoVal">72</span>
+  </div>
+  <div class="sep"></div>
+  <div class="vol-group">
+    <label>Melody</label>
+    <input type="range" id="volMelody" min="0" max="100" value="80" oninput="updateVol()">
+  </div>
+  <div class="vol-group">
+    <label>Bass</label>
+    <input type="range" id="volBass" min="0" max="100" value="55" oninput="updateVol()">
+  </div>
+  <div class="vol-group">
+    <label>Chord</label>
+    <input type="range" id="volChord" min="0" max="100" value="40" oninput="updateVol()">
+  </div>
+</div>
+
+<div class="info-panel">
+  <div class="now-playing" id="nowPlaying">E Major &middot; 2/4 &middot; Andantino</div>
+  <div class="sub-info" id="subInfo">&mdash;</div>
+  <div class="decoded-text" id="decodedText">&mdash;</div>
+</div>
+
+<div class="roll-container">
+  <div class="roll-header">
+    <span>Piano Roll — Melody + Accompaniment</span>
+    <span id="rollInfo">87 notes &middot; E major</span>
+  </div>
+  <div class="roll-wrap" id="rollWrap">
+    <canvas class="roll-canvas" id="rollCanvas"></canvas>
+  </div>
+</div>
+
+<div class="notation-container" id="notationContainer"></div>
+
+<div class="footer">
+  <b>87</b> cipher symbols &middot; <b>3</b> sections &middot; E major &middot; Andantino<br>
+  Violin melody over piano accompaniment &middot; Music box cylinder encoding<br>
+  <b>DORA</b> &middot; <b>MUSIC</b> &middot; <b>THEE</b>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const S0 = [1,14,4,2,0,7,18,2,9,22,5,16,15,3,16,8,16,16,7,14,14,16,3,21];
+const S1 = [22,21,6,5,17,18,16,18,7,21,2,9,10,2,4,16,16,4,7,6,15,18,16,5,16,7,19,17];
+const S2 = [15,3,21,9,9,21,5,17,4,17,7,19,17,4,3,19,20,6,17,4,16,7,19,15,17,6,2,14,6,17,7,2,3,21,2];
+const FLAT = [...S0, ...S1, ...S2];
+
+const DORA_MAP = {0:'L',1:'D',2:'A',3:'T',4:'R',5:'C',6:'M',7:'N',8:'F',9:'E',
+                  10:'V',14:'O',15:'U',16:'I',17:'Y',18:'S',19:'B',20:'P',21:'H',22:'G'};
+
+const ANCHOR_MAP = {};
+[0,1,2,3].forEach(i => ANCHOR_MAP[i] = 'DORA');
+[43,44,45,46,47].forEach(i => ANCHOR_MAP[i] = 'MUSIC');
+[53,54,55,56].forEach(i => ANCHOR_MAP[i] = 'THEE');
+
+// E major scale
+const E_SCALE = [52, 54, 56, 57, 59, 61, 63, 64];
+const NOTE_NAMES = {40:'E2',42:'F#2',44:'G#2',45:'A2',47:'B2',49:'C#3',
+  52:'E3',54:'F#3',56:'G#3',57:'A3',59:'B3',61:'C#4',63:'D#4',64:'E4'};
+const SHORT = {52:'E',54:'F#',56:'G#',57:'A',59:'B',61:'C#',63:'D#',64:'E'};
+const DUR_BEATS = {0: 2.0, 1: 1.0, 2: 0.5};
+const DUR_NAMES = {0: 'half', 1: 'quarter', 2: 'eighth'};
+
+// ═══════════════════════════════════════════════════════════════
+// BUILD MELODY NOTES
+// ═══════════════════════════════════════════════════════════════
+const melody = FLAT.map((val, i) => {
+  const pi = Math.min(Math.floor(val / 3), 7);
+  const di = val % 3;
+  return {
+    index: i, value: val,
+    midi: E_SCALE[pi],
+    name: NOTE_NAMES[E_SCALE[pi]] || '?',
+    short: SHORT[E_SCALE[pi]] || '?',
+    dur: DUR_BEATS[di],
+    durType: DUR_NAMES[di],
+    letter: DORA_MAP[val] || '?',
+    isAnchor: ANCHOR_MAP[i] !== undefined,
+    anchorWord: ANCHOR_MAP[i] || null,
+    section: i < S0.length ? 0 : (i < S0.length + S1.length ? 1 : 2),
+  };
+});
+
+// ═══════════════════════════════════════════════════════════════
+// BAR GROUPING — 2/4 (2 beats per bar)
+// ═══════════════════════════════════════════════════════════════
+const BPB = 2;
+const bars = [];
+let curBar = { notes: [], beats: 0 };
+let beatAcc = 0;
+
+for (const n of melody) {
+  if (beatAcc + n.dur > BPB + 0.01) {
+    bars.push(curBar);
+    curBar = { notes: [], beats: 0 };
+    beatAcc = 0;
+  }
+  curBar.notes.push(n);
+  curBar.beats += n.dur;
+  beatAcc += n.dur;
+  if (Math.abs(beatAcc - BPB) < 0.01) {
+    bars.push(curBar);
+    curBar = { notes: [], beats: 0 };
+    beatAcc = 0;
+  }
+}
+if (curBar.notes.length) bars.push(curBar);
+
+// ═══════════════════════════════════════════════════════════════
+// HARMONY — E major chord analysis per bar
+// ═══════════════════════════════════════════════════════════════
+const CHORD_PCS = {
+  'E':   new Set([4, 8, 11]),
+  'F#m': new Set([6, 9, 1]),
+  'G#m': new Set([8, 11, 3]),
+  'A':   new Set([9, 1, 4]),
+  'B':   new Set([11, 3, 6]),
+  'C#m': new Set([1, 4, 8]),
+  'B7':  new Set([11, 3, 6, 9]),
+};
+
+const CHORD_MIDI = {
+  'E':   { bass: 40, chord: [52, 56, 59] },      // E2, E3+G#3+B3
+  'F#m': { bass: 42, chord: [54, 57, 61] },      // F#2, F#3+A3+C#4
+  'G#m': { bass: 44, chord: [56, 59, 63] },      // G#2, G#3+B3+D#4
+  'A':   { bass: 45, chord: [57, 61, 64] },      // A2, A3+C#4+E4
+  'B':   { bass: 47, chord: [59, 63] },           // B2, B3+D#4
+  'C#m': { bass: 49, chord: [52, 61] },           // C#3, E3+C#4
+  'B7':  { bass: 47, chord: [57, 59, 63] },      // B2, A3+B3+D#4
+};
+
+function analyzeChord(pitches) {
+  const pcs = new Set(pitches.map(p => p % 12));
+  let best = 'E', bestS = -1;
+  for (const [name, cpcs] of Object.entries(CHORD_PCS)) {
+    let s = 0;
+    for (const pc of pcs) if (cpcs.has(pc)) s++;
+    if (s > bestS) { bestS = s; best = name; }
+  }
+  return best;
+}
+
+// Assign chords per bar
+const barChords = bars.map((bar, i) => {
+  const pitches = bar.notes.map(n => n.midi);
+  let ch = analyzeChord(pitches);
+  // Force tonic at start/end, dominant before end
+  if (i === 0 || i === bars.length - 1) ch = 'E';
+  if (i === bars.length - 2) ch = 'B7';
+  return ch;
+});
+
+// ═══════════════════════════════════════════════════════════════
+// ACCOMPANIMENT SCHEDULE
+// ═══════════════════════════════════════════════════════════════
+// Build full time-based schedule for accompaniment
+function buildAccompSchedule() {
+  const schedule = []; // {type, midi, startBeat, dur}
+  let beatPos = 0;
+
+  bars.forEach((bar, bi) => {
+    const ch = barChords[bi];
+    const c = CHORD_MIDI[ch];
+    const barDur = bar.beats;
+
+    // Bass on beat 1
+    schedule.push({ type: 'bass', midi: c.bass, startBeat: beatPos, dur: barDur * 0.45 });
+
+    // Chord on beat 2 (or spread for longer bars)
+    if (barDur >= 1.5) {
+      const chordStart = beatPos + barDur * 0.5;
+      const chordDur = barDur * 0.4;
+      c.chord.forEach(p => {
+        schedule.push({ type: 'chord', midi: p, startBeat: chordStart, dur: chordDur });
+      });
+    }
+
+    beatPos += barDur;
+  });
+
+  return schedule;
+}
+
+const accompSchedule = buildAccompSchedule();
+
+// ═══════════════════════════════════════════════════════════════
+// BUILD MELODY SCHEDULE (with absolute beat positions)
+// ═══════════════════════════════════════════════════════════════
+let melBeatPos = 0;
+melody.forEach(n => {
+  n.startBeat = melBeatPos;
+  melBeatPos += n.dur;
+});
+const totalBeats = melBeatPos;
+
+// ═══════════════════════════════════════════════════════════════
+// MARKINGS
+// ═══════════════════════════════════════════════════════════════
+const MARKINGS = {
+  0: 'p dolce', 3: 'cresc.', 6: 'sf', 7: 'p dolciss.',
+  10: 'pp', 14: 'poco cresc.', 18: 'cresc. molto', 20: 'sf',
+  22: 'dim.', 25: 'pp poco rit.', 28: 'cresc. molto', 30: 'rit.',
+  32: 'p a tempo', 36: 'dolce', 38: 'dolciss.', 40: 'dim. e rall.', 42: 'pp',
+};
+
+// ═══════════════════════════════════════════════════════════════
+// PIANO ROLL
+// ═══════════════════════════════════════════════════════════════
+const canvas = document.getElementById('rollCanvas');
+const ctx2d = canvas.getContext('2d');
+const rollWrap = document.getElementById('rollWrap');
+
+const ROLL_NOTE_H = 12;
+const ROLL_BEAT_W = 40;
+const ROLL_LEFT = 50;
+const MIDI_LOW = 38;
+const MIDI_HIGH = 66;
+const PITCH_RANGE = MIDI_HIGH - MIDI_LOW;
+
+function drawRoll() {
+  const w = ROLL_LEFT + totalBeats * ROLL_BEAT_W + 40;
+  const h = PITCH_RANGE * ROLL_NOTE_H + 20;
+  canvas.width = w;
+  canvas.height = h;
+
+  // Background
+  ctx2d.fillStyle = '#1a1820';
+  ctx2d.fillRect(0, 0, w, h);
+
+  // Pitch grid lines + labels
+  for (let m = MIDI_LOW; m <= MIDI_HIGH; m++) {
+    const y = (MIDI_HIGH - m) * ROLL_NOTE_H + 10;
+    const pc = m % 12;
+    const isScale = [0, 1, 3, 4, 6, 8, 11].includes(pc); // E major pitch classes
+    ctx2d.strokeStyle = isScale ? '#2a2838' : '#1e1c28';
+    ctx2d.beginPath();
+    ctx2d.moveTo(ROLL_LEFT, y);
+    ctx2d.lineTo(w, y);
+    ctx2d.stroke();
+
+    if (NOTE_NAMES[m]) {
+      ctx2d.fillStyle = '#555';
+      ctx2d.font = '9px monospace';
+      ctx2d.textAlign = 'right';
+      ctx2d.fillText(NOTE_NAMES[m], ROLL_LEFT - 4, y + 4);
+    }
+  }
+
+  // Beat grid
+  for (let b = 0; b <= totalBeats; b++) {
+    const x = ROLL_LEFT + b * ROLL_BEAT_W;
+    ctx2d.strokeStyle = b % BPB === 0 ? '#333' : '#222';
+    ctx2d.lineWidth = b % BPB === 0 ? 1.5 : 0.5;
+    ctx2d.beginPath();
+    ctx2d.moveTo(x, 0);
+    ctx2d.lineTo(x, h);
+    ctx2d.stroke();
+    ctx2d.lineWidth = 1;
+  }
+
+  // Accompaniment notes (behind melody)
+  accompSchedule.forEach(a => {
+    const x = ROLL_LEFT + a.startBeat * ROLL_BEAT_W;
+    const y = (MIDI_HIGH - a.midi) * ROLL_NOTE_H + 10;
+    const w2 = a.dur * ROLL_BEAT_W;
+    ctx2d.fillStyle = a.type === 'bass' ? 'rgba(90,138,90,0.5)' : 'rgba(90,120,160,0.35)';
+    ctx2d.fillRect(x, y - ROLL_NOTE_H/2, w2, ROLL_NOTE_H - 1);
+  });
+
+  // Melody notes
+  melody.forEach(n => {
+    const x = ROLL_LEFT + n.startBeat * ROLL_BEAT_W;
+    const y = (MIDI_HIGH - n.midi) * ROLL_NOTE_H + 10;
+    const w2 = n.dur * ROLL_BEAT_W;
+
+    if (n.isAnchor) {
+      ctx2d.fillStyle = '#b83a2a';
+    } else {
+      const secColors = ['#c4a35a', '#a3c45a', '#5aa3c4'];
+      ctx2d.fillStyle = secColors[n.section];
+    }
+    ctx2d.fillRect(x, y - ROLL_NOTE_H/2, w2, ROLL_NOTE_H - 1);
+
+    // Letter label
+    if (w2 > 14) {
+      ctx2d.fillStyle = '#fff';
+      ctx2d.font = 'bold 8px monospace';
+      ctx2d.textAlign = 'center';
+      ctx2d.fillText(n.letter, x + w2/2, y + 3);
+    }
+  });
+}
+
+drawRoll();
+
+// Playhead
+const playheadEl = document.createElement('div');
+playheadEl.style.cssText = 'position:absolute;top:0;bottom:0;width:2px;background:#ff4444;z-index:10;display:none;pointer-events:none;';
+rollWrap.appendChild(playheadEl);
+
+function movePlayhead(beat) {
+  const x = ROLL_LEFT + beat * ROLL_BEAT_W;
+  playheadEl.style.left = x + 'px';
+  playheadEl.style.display = 'block';
+  // Auto-scroll
+  const wrapW = rollWrap.clientWidth;
+  if (x > rollWrap.scrollLeft + wrapW * 0.7) {
+    rollWrap.scrollLeft = x - wrapW * 0.3;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NOTATION (compact below roll)
+// ═══════════════════════════════════════════════════════════════
+const notationEl = document.getElementById('notationContainer');
+const BPS = 8; // bars per system
+
+for (let s = 0; s < bars.length; s += BPS) {
+  const end = Math.min(s + BPS, bars.length);
+  const row = document.createElement('div');
+  row.className = 'system-row';
+
+  for (let b = s; b < end; b++) {
+    const bar = bars[b];
+    const barEl = document.createElement('div');
+    barEl.className = 'bar-group';
+    barEl.style.flex = `${bar.beats} 0 0`;
+
+    const numEl = document.createElement('div');
+    numEl.className = 'bar-num';
+    numEl.textContent = b + 1;
+    barEl.appendChild(numEl);
+
+    if (MARKINGS[b]) {
+      const mk = document.createElement('div');
+      mk.className = 'marking';
+      mk.textContent = MARKINGS[b];
+      barEl.appendChild(mk);
+    }
+
+    // Chord symbol
+    const chEl = document.createElement('div');
+    chEl.className = 'chord-label';
+    chEl.textContent = barChords[b];
+    barEl.appendChild(chEl);
+
+    for (const n of bar.notes) {
+      const cell = document.createElement('div');
+      cell.className = 'note-cell';
+      cell.id = `nn-${n.index}`;
+      cell.onclick = () => previewNote(n);
+      cell.style.flex = `${n.dur} 0 0`;
+
+      const head = document.createElement('div');
+      const isH = n.durType === 'half';
+      const isE = n.durType === 'eighth';
+      head.className = `nhead ${isH ? 'open' : 'filled'} ${isE ? 'small' : ''}`;
+      head.textContent = n.short;
+      cell.appendChild(head);
+
+      const lt = document.createElement('div');
+      lt.className = `nletter ${n.isAnchor ? 'anchor' : ''}`;
+      lt.textContent = n.letter;
+      cell.appendChild(lt);
+
+      barEl.appendChild(cell);
+    }
+    row.appendChild(barEl);
+  }
+  notationEl.appendChild(row);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIO ENGINE
+// ═══════════════════════════════════════════════════════════════
+let audioCtx = null;
+let playing = false;
+let scheduledSources = [];
+let animFrame = null;
+let playStartTime = 0;
+let playStartBeat = 0;
+let tempo = 72;
+let volMelody = 0.8, volBass = 0.55, volChord = 0.4;
+
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function freq(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+function beatToSec(b) { return (b * 60) / tempo; }
+
+function updateVol() {
+  volMelody = document.getElementById('volMelody').value / 100;
+  volBass = document.getElementById('volBass').value / 100;
+  volChord = document.getElementById('volChord').value / 100;
+}
+
+// ── Timbres ──
+
+function schedMelody(ctx, midi, startSec, durSec, vol) {
+  // Music box / violin hybrid — bright metallic with singing sustain
+  const f = freq(midi);
+
+  // Fundamental (triangle = music box character)
+  const o1 = ctx.createOscillator();
+  o1.type = 'triangle';
+  o1.frequency.value = f;
+
+  // 2nd harmonic (warmth)
+  const o2 = ctx.createOscillator();
+  o2.type = 'sine';
+  o2.frequency.value = f * 2;
+
+  // 3rd harmonic (brightness/ring)
+  const o3 = ctx.createOscillator();
+  o3.type = 'sine';
+  o3.frequency.value = f * 3;
+
+  // 5th harmonic (music box sparkle)
+  const o5 = ctx.createOscillator();
+  o5.type = 'sine';
+  o5.frequency.value = f * 5;
+
+  // Vibrato (subtle)
+  const vib = ctx.createOscillator();
+  const vibG = ctx.createGain();
+  vib.frequency.value = 5.2;
+  vibG.gain.value = 1.8;
+  vib.connect(vibG);
+  vibG.connect(o1.frequency);
+
+  const g = ctx.createGain();
+  const g2 = ctx.createGain();
+  const g3 = ctx.createGain();
+  const g5 = ctx.createGain();
+
+  o1.connect(g); g.connect(ctx.destination);
+  o2.connect(g2); g2.connect(ctx.destination);
+  o3.connect(g3); g3.connect(ctx.destination);
+  o5.connect(g5); g5.connect(ctx.destination);
+
+  const v = vol * 0.16;
+  const t = startSec;
+
+  // Music box envelope: bright attack, gentle sustain, natural decay
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(v, t + 0.012);
+  g.gain.setValueAtTime(v, t + 0.012);
+  g.gain.exponentialRampToValueAtTime(v * 0.6, t + durSec * 0.3);
+  g.gain.linearRampToValueAtTime(v * 0.4, t + durSec * 0.85);
+  g.gain.linearRampToValueAtTime(0.001, t + durSec);
+
+  g2.gain.setValueAtTime(0, t);
+  g2.gain.linearRampToValueAtTime(v * 0.25, t + 0.008);
+  g2.gain.exponentialRampToValueAtTime(v * 0.05, t + durSec * 0.5);
+  g2.gain.linearRampToValueAtTime(0.001, t + durSec);
+
+  g3.gain.setValueAtTime(0, t);
+  g3.gain.linearRampToValueAtTime(v * 0.12, t + 0.006);
+  g3.gain.exponentialRampToValueAtTime(0.001, t + durSec * 0.4);
+
+  g5.gain.setValueAtTime(0, t);
+  g5.gain.linearRampToValueAtTime(v * 0.06, t + 0.004);
+  g5.gain.exponentialRampToValueAtTime(0.001, t + durSec * 0.25);
+
+  const endT = t + durSec + 0.1;
+  [o1,o2,o3,o5,vib].forEach(o => { o.start(t); o.stop(endT); });
+  scheduledSources.push(o1, o2, o3, o5, vib);
+}
+
+function schedBass(ctx, midi, startSec, durSec, vol) {
+  const f = freq(midi);
+  const o = ctx.createOscillator();
+  o.type = 'sine';
+  o.frequency.value = f;
+
+  const o2 = ctx.createOscillator();
+  o2.type = 'sine';
+  o2.frequency.value = f * 2;
+
+  const g = ctx.createGain();
+  const g2 = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o2.connect(g2); g2.connect(ctx.destination);
+
+  const v = vol * 0.12;
+  const t = startSec;
+
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(v, t + 0.015);
+  g.gain.exponentialRampToValueAtTime(v * 0.3, t + durSec * 0.6);
+  g.gain.linearRampToValueAtTime(0.001, t + durSec);
+
+  g2.gain.setValueAtTime(0, t);
+  g2.gain.linearRampToValueAtTime(v * 0.15, t + 0.01);
+  g2.gain.linearRampToValueAtTime(0.001, t + durSec * 0.5);
+
+  const endT = t + durSec + 0.1;
+  o.start(t); o.stop(endT);
+  o2.start(t); o2.stop(endT);
+  scheduledSources.push(o, o2);
+}
+
+function schedChord(ctx, midi, startSec, durSec, vol) {
+  const f = freq(midi);
+  const o = ctx.createOscillator();
+  o.type = 'sine';
+  o.frequency.value = f;
+
+  const g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+
+  const v = vol * 0.08;
+  const t = startSec;
+
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(v, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(v * 0.2, t + durSec * 0.7);
+  g.gain.linearRampToValueAtTime(0.001, t + durSec);
+
+  o.start(t); o.stop(t + durSec + 0.1);
+  scheduledSources.push(o);
+}
+
+// ── Preview ──
+function previewNote(n) {
+  const ctx = getAudio();
+  schedMelody(ctx, n.midi, ctx.currentTime, beatToSec(n.dur), volMelody);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PLAYBACK CONTROL
+// ═══════════════════════════════════════════════════════════════
+function scheduleAll(fromBeat) {
+  const ctx = getAudio();
+  const now = ctx.currentTime;
+  playStartTime = now;
+  playStartBeat = fromBeat;
+
+  // Schedule melody
+  melody.forEach(n => {
+    if (n.startBeat >= fromBeat) {
+      const offset = beatToSec(n.startBeat - fromBeat);
+      schedMelody(ctx, n.midi, now + offset, beatToSec(n.dur), volMelody);
+    }
+  });
+
+  // Schedule accompaniment
+  accompSchedule.forEach(a => {
+    if (a.startBeat >= fromBeat) {
+      const offset = beatToSec(a.startBeat - fromBeat);
+      const durSec = beatToSec(a.dur);
+      if (a.type === 'bass') {
+        schedBass(ctx, a.midi, now + offset, durSec, volBass);
+      } else {
+        schedChord(ctx, a.midi, now + offset, durSec, volChord);
+      }
+    }
+  });
+}
+
+function animate() {
+  if (!playing) return;
+  const ctx = getAudio();
+  const elapsed = ctx.currentTime - playStartTime;
+  const currentBeat = playStartBeat + (elapsed * tempo) / 60;
+
+  if (currentBeat >= totalBeats) {
+    stop();
+    return;
+  }
+
+  // Move playhead
+  movePlayhead(currentBeat);
+
+  // Highlight current melody note
+  let cur = -1;
+  for (let i = 0; i < melody.length; i++) {
+    if (melody[i].startBeat <= currentBeat && melody[i].startBeat + melody[i].dur > currentBeat) {
+      cur = i;
+      break;
+    }
+  }
+
+  if (cur >= 0 && cur !== window._lastHighlight) {
+    window._lastHighlight = cur;
+    highlightNote(cur);
+  }
+
+  animFrame = requestAnimationFrame(animate);
+}
+
+function highlightNote(idx) {
+  document.querySelectorAll('.note-cell.playing').forEach(el => el.classList.remove('playing'));
+  const el = document.getElementById(`nn-${idx}`);
+  if (el) {
+    el.classList.add('playing');
+    // Scroll notation into view
+    el.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  }
+  const n = melody[idx];
+  const sn = ['I','II','III'];
+  document.getElementById('nowPlaying').textContent =
+    `${n.name} — ${n.durType}${n.isAnchor ? ' — ' + n.anchorWord : ''} — Section ${sn[n.section]}`;
+  document.getElementById('subInfo').textContent =
+    `Note ${idx+1}/87 · Beat ${n.startBeat.toFixed(1)} · ${barChords[getBarIdx(idx)]}`;
+
+  // Decoded text
+  const dtEl = document.getElementById('decodedText');
+  const start = Math.max(0, idx - 35);
+  let html = '';
+  for (let i = start; i <= idx; i++) {
+    const lt = melody[i].letter;
+    if (melody[i].isAnchor) html += `<span class="anchor">${lt}</span>`;
+    else html += lt;
+  }
+  dtEl.innerHTML = html;
+}
+
+function getBarIdx(noteIdx) {
+  let count = 0;
+  for (let b = 0; b < bars.length; b++) {
+    count += bars[b].notes.length;
+    if (noteIdx < count) return b;
+  }
+  return bars.length - 1;
+}
+
+function togglePlay() {
+  if (playing) {
+    // Pause
+    stopSources();
+    playing = false;
+    if (animFrame) cancelAnimationFrame(animFrame);
+    playheadEl.style.display = 'none';
+    document.getElementById('playBtn').textContent = '▶ Andantino';
+  } else {
+    playing = true;
+    window._lastHighlight = -1;
+    document.getElementById('playBtn').textContent = '⏸ Pause';
+    scheduleAll(0);
+    animate();
+  }
+}
+
+function stop() {
+  stopSources();
+  playing = false;
+  if (animFrame) cancelAnimationFrame(animFrame);
+  playheadEl.style.display = 'none';
+  window._lastHighlight = -1;
+  document.querySelectorAll('.note-cell.playing').forEach(el => el.classList.remove('playing'));
+  document.getElementById('playBtn').textContent = '▶ Andantino';
+  document.getElementById('nowPlaying').textContent = 'E Major · 2/4 · Andantino';
+  document.getElementById('subInfo').textContent = '—';
+  document.getElementById('decodedText').textContent = '—';
+}
+
+function restart() {
+  stop();
+  setTimeout(() => {
+    playing = true;
+    window._lastHighlight = -1;
+    document.getElementById('playBtn').textContent = '⏸ Pause';
+    scheduleAll(0);
+    animate();
+  }, 100);
+}
+
+function stopSources() {
+  scheduledSources.forEach(s => { try { s.stop(); } catch(e) {} });
+  scheduledSources = [];
+}
+
+function updateTempo(val) {
+  tempo = parseInt(val);
+  document.getElementById('tempoVal').textContent = val;
+  // If playing, restart with new tempo
+  if (playing) {
+    const ctx = getAudio();
+    const elapsed = ctx.currentTime - playStartTime;
+    const currentBeat = playStartBeat + (elapsed * tempo) / 60;
+    stopSources();
+    scheduleAll(Math.min(currentBeat, totalBeats - 1));
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dorabella × Salut d'Amour — Alignment</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Georgia', serif; background: #0a0a12; color: #e0d8c8;
+  min-height: 100vh; padding: 20px;
+}
+h1 { text-align: center; font-size: 1.6em; color: #c4a35a; margin-bottom: 4px; letter-spacing: 2px; }
+h2 { text-align: center; font-size: 1em; color: #8a7a5a; margin-bottom: 15px; font-weight: normal; font-style: italic; }
+
+.controls {
+  display: flex; gap: 10px; justify-content: center; align-items: center;
+  flex-wrap: wrap; margin-bottom: 15px;
+}
+button {
+  background: #1a1a2e; border: 1px solid #c4a35a; color: #c4a35a;
+  padding: 8px 18px; cursor: pointer; font-size: 14px; border-radius: 4px;
+  transition: all 0.2s;
+}
+button:hover { background: #c4a35a; color: #0a0a12; }
+button.active { background: #c4a35a; color: #0a0a12; font-weight: bold; }
+.tempo-ctrl { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #8a7a5a; }
+.tempo-ctrl input { width: 80px; accent-color: #c4a35a; }
+
+.legend {
+  display: flex; gap: 20px; justify-content: center; margin-bottom: 12px;
+  font-size: 12px; flex-wrap: wrap;
+}
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+.alignment-container {
+  width: 100%; overflow-x: auto; position: relative;
+  background: #0d0d18; border: 1px solid #222; border-radius: 6px;
+  padding: 10px;
+}
+
+.piano-roll {
+  position: relative; min-width: 100%;
+}
+
+.pitch-label {
+  position: absolute; left: 0; font-size: 10px; color: #555;
+  width: 40px; text-align: right; padding-right: 4px;
+}
+.grid-line {
+  position: absolute; left: 44px; right: 0; height: 1px;
+  background: #1a1a2a; pointer-events: none;
+}
+.grid-line.scale { background: #252535; }
+
+.note-block {
+  position: absolute; border-radius: 3px; opacity: 0.85;
+  transition: opacity 0.15s;
+  cursor: pointer;
+  font-size: 8px; color: rgba(255,255,255,0.7);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; white-space: nowrap;
+}
+.note-block:hover { opacity: 1; z-index: 10; }
+.note-block.playing { opacity: 1; box-shadow: 0 0 8px rgba(255,255,255,0.5); z-index: 10; }
+.note-block.match { border: 2px solid #fff !important; opacity: 1; }
+
+.note-block.cipher { background: #c4a35a; border: 1px solid #d4b36a; }
+.note-block.salut { background: #5a8ac4; border: 1px solid #6a9ad4; }
+.note-block.match-cipher { background: #e8c84a; border: 2px solid #fff; }
+.note-block.match-salut { background: #4a78e8; border: 2px solid #fff; }
+
+.playhead {
+  position: absolute; top: 0; bottom: 0; width: 2px;
+  background: #ff4444; z-index: 20; pointer-events: none;
+  display: none;
+}
+
+.bar-line {
+  position: absolute; top: 0; bottom: 0; width: 1px;
+  background: #2a2a3a; pointer-events: none;
+}
+.bar-number {
+  position: absolute; top: -14px; font-size: 9px; color: #444;
+  transform: translateX(-50%);
+}
+
+.stats {
+  margin-top: 15px; padding: 12px; background: #111122; border-radius: 6px;
+  font-size: 12px; line-height: 1.7; border: 1px solid #222;
+}
+.stats h3 { color: #c4a35a; margin-bottom: 6px; font-size: 14px; }
+.match-list { max-height: 150px; overflow-y: auto; margin-top: 6px; }
+.match-entry { padding: 3px 0; border-bottom: 1px solid #1a1a2a; cursor: pointer; }
+.match-entry:hover { color: #c4a35a; }
+
+.info-bar {
+  text-align: center; font-size: 12px; color: #666; margin: 8px 0;
+  min-height: 20px;
+}
+.now-playing { color: #c4a35a; font-weight: bold; }
+
+.section-label {
+  position: absolute; top: -26px; font-size: 10px; color: #c4a35a;
+  font-weight: bold; background: #0d0d18; padding: 0 4px;
+}
+</style>
+</head>
+<body>
+
+<h1>DORABELLA CIPHER × SALUT D'AMOUR</h1>
+<h2>Melodic Alignment — E major, Andantino</h2>
+
+<div class="controls">
+  <button id="btnPlay" onclick="playBoth()">&#9654; Play Together</button>
+  <button id="btnCipher" onclick="playCipherOnly()">Cipher Solo</button>
+  <button id="btnSalut" onclick="playSalutOnly()">Salut Solo</button>
+  <button id="btnStop" onclick="stopAll()">&#9632; Stop</button>
+  <div class="tempo-ctrl">
+    <span>BPM:</span>
+    <input type="range" id="tempoSlider" min="40" max="120" value="72">
+    <span id="tempoVal">72</span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#c4a35a"></div> Cipher melody (87 notes)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#5a8ac4"></div> Salut d'Amour violin (80 notes)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#fff;border:2px solid #e8c84a"></div> Matching intervals</div>
+</div>
+
+<div class="info-bar" id="infoBar">Click Play to hear both melodies aligned</div>
+
+<div class="alignment-container" id="rollContainer">
+  <div class="piano-roll" id="pianoRoll">
+    <div class="playhead" id="playhead"></div>
+  </div>
+</div>
+
+<div class="stats" id="statsPanel">
+  <h3>Alignment Analysis</h3>
+  <div id="statsContent">Loading...</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CIPHER MELODY (E major)
+// ═══════════════════════════════════════════════════════
+const S0 = [1,14,4,2,0,7,18,2,9,22,5,16,15,3,16,8,16,16,7,14,14,16,3,21,22,21,6,5,17];
+const S1 = [18,16,18,7,21,2,9,10,2,4,16,16,4,7,6,15,18,16,5,16,7,19,17,15,3];
+const S2 = [21,9,9,21,5,17,4,17,7,19,17,4,3,19,20,6,17,4,16,7,19,15,17,6,2,14,6,17,7,2,3,21,2];
+const FLAT = [...S0, ...S1, ...S2];
+
+const E_MAJOR = [52, 54, 56, 57, 59, 61, 63, 64];
+const DUR_MAP = {0: 2.0, 1: 1.0, 2: 0.5};
+const DORA_MAP = {0:'L',1:'D',2:'A',3:'T',4:'R',5:'C',6:'M',7:'N',8:'F',9:'E',
+                  10:'V',14:'O',15:'U',16:'I',17:'Y',18:'S',19:'B',20:'P',21:'H',22:'G'};
+
+const NOTE_NAMES = {52:'E3',54:'F#3',56:'G#3',57:'A3',59:'B3',61:'C#4',63:'D#4',64:'E4',
+  65:'F4',66:'F#4',67:'G4',68:'G#4',69:'A4',70:'A#4',71:'B4',73:'C#5',
+  75:'D#5',76:'E5',78:'F#5',79:'G5',80:'G#5',81:'A5',83:'B5',85:'C#6'};
+
+function nn(midi) {
+  const names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  return names[midi % 12] + (Math.floor(midi/12) - 1);
+}
+
+// Build cipher notes with cumulative beat positions
+let cipherBeat = 0;
+const cipherNotes = FLAT.map((val, i) => {
+  const midi = E_MAJOR[Math.floor(val / 3)];
+  const dur = DUR_MAP[val % 3];
+  const note = {
+    idx: i, midi, dur, beat: cipherBeat,
+    name: nn(midi), letter: DORA_MAP[val] || '?',
+    type: 'cipher'
+  };
+  cipherBeat += dur;
+  return note;
+});
+
+// ═══════════════════════════════════════════════════════
+// SALUT D'AMOUR VIOLIN MELODY (extracted from MIDI)
+// ═══════════════════════════════════════════════════════
+const SALUT_RAW = [
+  {midi:80,dur:2.107},{midi:80,dur:0.971},{midi:78,dur:0.414},{midi:76,dur:0.763},
+  {midi:75,dur:0.664},{midi:76,dur:0.461},{midi:81,dur:0.771},{midi:81,dur:0.651},
+  {midi:81,dur:1.081},{midi:75,dur:0.430},{midi:80,dur:1.828},{midi:80,dur:0.924},
+  {midi:78,dur:1.083},{midi:76,dur:0.836},{midi:75,dur:0.862},{midi:76,dur:0.891},
+  {midi:78,dur:0.984},{midi:76,dur:0.706},{midi:78,dur:1.201},{midi:76,dur:0.820},
+  {midi:78,dur:3.034},{midi:75,dur:1.125},{midi:79,dur:1.336},{midi:80,dur:2.307},
+  {midi:80,dur:0.964},{midi:78,dur:0.440},{midi:76,dur:0.781},{midi:75,dur:0.714},
+  {midi:76,dur:0.411},{midi:85,dur:1.023},{midi:81,dur:0.583},{midi:85,dur:0.789},
+  {midi:83,dur:0.568},{midi:85,dur:1.534},{midi:83,dur:0.370},{midi:81,dur:0.404},
+  {midi:80,dur:1.490},{midi:76,dur:1.326},{midi:78,dur:0.721},{midi:76,dur:0.536},
+  {midi:73,dur:1.229},{midi:75,dur:1.849},{midi:76,dur:0.870},{midi:68,dur:0.919},
+  {midi:69,dur:0.958},{midi:70,dur:1.344},{midi:71,dur:2.034},{midi:80,dur:2.003},
+  {midi:80,dur:0.924},{midi:78,dur:0.305},{midi:76,dur:0.729},{midi:75,dur:0.411},
+  {midi:76,dur:0.307},{midi:81,dur:0.615},{midi:81,dur:0.586},{midi:81,dur:0.638},
+  {midi:80,dur:1.732},{midi:68,dur:0.818},{midi:80,dur:0.852},{midi:78,dur:0.901},
+  {midi:76,dur:0.841},{midi:75,dur:0.789},{midi:76,dur:0.815},{midi:78,dur:0.786},
+  {midi:76,dur:0.776},{midi:78,dur:1.188},{midi:76,dur:1.010},{midi:78,dur:2.779},
+  {midi:75,dur:0.690},{midi:79,dur:1.057},{midi:80,dur:1.826},{midi:80,dur:1.021},
+  {midi:78,dur:0.500},{midi:76,dur:0.836},{midi:75,dur:0.779},{midi:76,dur:0.508},
+  {midi:85,dur:0.870},{midi:81,dur:0.555},{midi:85,dur:1.018}
+];
+
+let salutBeat = 0;
+const salutNotes = SALUT_RAW.map((s, i) => {
+  const note = {
+    idx: i, midi: s.midi, dur: s.dur, beat: salutBeat,
+    name: nn(s.midi), type: 'salut'
+  };
+  salutBeat += s.dur;
+  return note;
+});
+
+// ═══════════════════════════════════════════════════════
+// FIND MATCHING INTERVALS
+// ═══════════════════════════════════════════════════════
+function intervals(notes) {
+  const ints = [];
+  for (let i = 0; i < notes.length - 1; i++) {
+    ints.push(notes[i+1].midi - notes[i].midi);
+  }
+  return ints;
+}
+
+// Normalize cipher to same octave range as salut for comparison
+function normMidi(midi) {
+  while (midi < 68) midi += 12;
+  while (midi > 85) midi -= 12;
+  return midi;
+}
+
+const cipherInts = intervals(cipherNotes);
+const salutInts = intervals(salutNotes);
+
+// Also compute intervals on octave-normalized cipher
+const cipherNorm = cipherNotes.map(n => normMidi(n.midi));
+const cipherNormInts = [];
+for (let i = 0; i < cipherNorm.length - 1; i++) {
+  cipherNormInts.push(cipherNorm[i+1] - cipherNorm[i]);
+}
+
+const matches = [];
+
+// Interval matches (3+ notes)
+for (let ws = 3; ws <= 6; ws++) {
+  for (let i = 0; i <= salutInts.length - ws; i++) {
+    for (let j = 0; j <= cipherInts.length - ws; j++) {
+      let match = true;
+      for (let k = 0; k < ws; k++) {
+        if (salutInts[i+k] !== cipherInts[j+k]) { match = false; break; }
+      }
+      if (match) {
+        matches.push({
+          type: 'interval', size: ws + 1,
+          salutStart: i, salutEnd: i + ws,
+          cipherStart: j, cipherEnd: j + ws,
+          label: `${ws+1}-note interval match`
+        });
+      }
+    }
+  }
+}
+
+// Contour matches (8+ notes, >=75% match)
+function contour(notes) {
+  const c = [];
+  for (let i = 0; i < notes.length - 1; i++) {
+    if (notes[i+1].midi > notes[i].midi) c.push(1);
+    else if (notes[i+1].midi < notes[i].midi) c.push(-1);
+    else c.push(0);
+  }
+  return c;
+}
+
+const salutCont = contour(salutNotes);
+const cipherCont = contour(cipherNotes);
+
+for (let ws = 8; ws <= 16; ws++) {
+  for (let i = 0; i <= salutCont.length - ws; i++) {
+    for (let j = 0; j <= cipherCont.length - ws; j++) {
+      let mc = 0;
+      for (let k = 0; k < ws; k++) {
+        if (salutCont[i+k] === cipherCont[j+k]) mc++;
+      }
+      if (mc >= ws * 0.75) {
+        matches.push({
+          type: 'contour', size: ws + 1, matchPct: Math.round(100 * mc / ws),
+          salutStart: i, salutEnd: i + ws,
+          cipherStart: j, cipherEnd: j + ws,
+          label: `${ws+1}-note contour (${Math.round(100*mc/ws)}%)`
+        });
+      }
+    }
+  }
+}
+
+// Sort by size descending
+matches.sort((a, b) => b.size - a.size || (b.matchPct||0) - (a.matchPct||0));
+
+// Mark notes involved in top matches
+const cipherMatchSet = new Set();
+const salutMatchSet = new Set();
+const topMatches = matches.slice(0, 20);
+for (const m of topMatches) {
+  for (let k = m.cipherStart; k <= m.cipherEnd; k++) cipherMatchSet.add(k);
+  for (let k = m.salutStart; k <= m.salutEnd; k++) salutMatchSet.add(k);
+}
+
+// ═══════════════════════════════════════════════════════
+// PIANO ROLL VISUALIZATION
+// ═══════════════════════════════════════════════════════
+const BEAT_PX = 28; // pixels per beat
+const NOTE_HEIGHT = 8;
+const LEFT_MARGIN = 48;
+
+// Total beats
+const totalBeats = Math.max(
+  cipherNotes[cipherNotes.length-1].beat + cipherNotes[cipherNotes.length-1].dur,
+  salutNotes[salutNotes.length-1].beat + salutNotes[salutNotes.length-1].dur
+);
+
+// Pitch range
+const allMidi = [
+  ...cipherNotes.map(n => n.midi),
+  ...salutNotes.map(n => n.midi)
+];
+const minPitch = Math.min(...allMidi) - 1;
+const maxPitch = Math.max(...allMidi) + 1;
+const pitchRange = maxPitch - minPitch + 1;
+
+const rollWidth = LEFT_MARGIN + totalBeats * BEAT_PX + 20;
+const rollHeight = pitchRange * NOTE_HEIGHT + 40;
+
+function pitchToY(midi) {
+  return rollHeight - 30 - (midi - minPitch) * NOTE_HEIGHT;
+}
+
+function beatToX(beat) {
+  return LEFT_MARGIN + beat * BEAT_PX;
+}
+
+function buildRoll() {
+  const roll = document.getElementById('pianoRoll');
+  roll.style.width = rollWidth + 'px';
+  roll.style.height = rollHeight + 'px';
+  roll.innerHTML = '<div class="playhead" id="playhead"></div>';
+
+  // E major scale pitches for highlighting
+  const eMajorPC = new Set([4, 6, 8, 9, 11, 1, 3]); // E F# G# A B C# D#
+
+  // Pitch grid lines + labels
+  for (let p = minPitch; p <= maxPitch; p++) {
+    const y = pitchToY(p);
+    const isScale = eMajorPC.has(p % 12);
+    const div = document.createElement('div');
+    div.className = 'grid-line' + (isScale ? ' scale' : '');
+    div.style.top = y + 'px';
+    roll.appendChild(div);
+
+    if (isScale || p === minPitch || p === maxPitch) {
+      const label = document.createElement('div');
+      label.className = 'pitch-label';
+      label.style.top = (y - 5) + 'px';
+      label.textContent = nn(p);
+      roll.appendChild(label);
+    }
+  }
+
+  // Bar lines (every 2 beats for 2/4)
+  for (let bar = 0; bar <= Math.ceil(totalBeats / 2); bar++) {
+    const x = beatToX(bar * 2);
+    const line = document.createElement('div');
+    line.className = 'bar-line';
+    line.style.left = x + 'px';
+    line.style.height = rollHeight + 'px';
+    roll.appendChild(line);
+
+    if (bar % 4 === 0) {
+      const num = document.createElement('div');
+      num.className = 'bar-number';
+      num.style.left = x + 'px';
+      num.textContent = bar + 1;
+      roll.appendChild(num);
+    }
+  }
+
+  // Draw cipher notes (lower layer)
+  cipherNotes.forEach((n, i) => {
+    const div = document.createElement('div');
+    const isMatch = cipherMatchSet.has(i);
+    div.className = 'note-block ' + (isMatch ? 'match-cipher' : 'cipher');
+    div.id = 'cipher-' + i;
+    div.style.left = beatToX(n.beat) + 'px';
+    div.style.top = pitchToY(n.midi) + 'px';
+    div.style.width = Math.max(4, n.dur * BEAT_PX - 1) + 'px';
+    div.style.height = NOTE_HEIGHT + 'px';
+    div.textContent = n.letter;
+    div.title = `Cipher [${i}] ${n.name} ${n.dur}b — "${n.letter}"`;
+    roll.appendChild(div);
+  });
+
+  // Draw salut notes (upper layer)
+  salutNotes.forEach((n, i) => {
+    const div = document.createElement('div');
+    const isMatch = salutMatchSet.has(i);
+    div.className = 'note-block ' + (isMatch ? 'match-salut' : 'salut');
+    div.id = 'salut-' + i;
+    div.style.left = beatToX(n.beat) + 'px';
+    div.style.top = pitchToY(n.midi) + 'px';
+    div.style.width = Math.max(4, n.dur * BEAT_PX - 1) + 'px';
+    div.style.height = NOTE_HEIGHT + 'px';
+    div.title = `Salut [${i}] ${n.name} ${n.dur.toFixed(2)}b`;
+    roll.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// STATS PANEL
+// ═══════════════════════════════════════════════════════
+function buildStats() {
+  const panel = document.getElementById('statsContent');
+
+  // Compute pitch-class profile correlation
+  const cipherPC = new Array(12).fill(0);
+  const salutPC = new Array(12).fill(0);
+  cipherNotes.forEach(n => cipherPC[n.midi % 12]++);
+  salutNotes.forEach(n => salutPC[n.midi % 12]++);
+  const cN = cipherNotes.length, sN = salutNotes.length;
+  const cProf = cipherPC.map(x => x / cN);
+  const sProf = salutPC.map(x => x / sN);
+
+  function corr(a, b) {
+    const n = a.length;
+    const ma = a.reduce((s,x)=>s+x,0)/n, mb = b.reduce((s,x)=>s+x,0)/n;
+    let num = 0, da = 0, db = 0;
+    for (let i = 0; i < n; i++) {
+      num += (a[i]-ma)*(b[i]-mb);
+      da += (a[i]-ma)**2;
+      db += (b[i]-mb)**2;
+    }
+    return num / Math.sqrt(da * db);
+  }
+
+  const pcCorr = corr(cProf, sProf);
+
+  // Best sliding contour correlation
+  let bestContour = 0, bestCI = 0, bestSI = 0;
+  for (let i = 0; i <= salutCont.length - 16; i++) {
+    for (let j = 0; j <= cipherCont.length - 16; j++) {
+      let mc = 0;
+      for (let k = 0; k < 16; k++) {
+        if (salutCont[i+k] === cipherCont[j+k]) mc++;
+      }
+      if (mc > bestContour) { bestContour = mc; bestSI = i; bestCI = j; }
+    }
+  }
+
+  // Interval matches summary
+  const intMatches = matches.filter(m => m.type === 'interval');
+  const contourMatches = matches.filter(m => m.type === 'contour');
+  const bySize = {};
+  intMatches.forEach(m => { bySize[m.size] = (bySize[m.size]||0) + 1; });
+
+  // Scale degree analysis
+  const eMajDeg = {4:0, 6:1, 8:2, 9:3, 11:4, 1:5, 3:6};
+  const degNames = ['1(E)', '2(F#)', '3(G#)', '4(A)', '5(B)', '6(C#)', '7(D#)'];
+  let cipherInScale = 0, salutInScale = 0;
+  cipherNotes.forEach(n => { if (eMajDeg.hasOwnProperty(n.midi % 12)) cipherInScale++; });
+  salutNotes.forEach(n => { if (eMajDeg.hasOwnProperty(n.midi % 12)) salutInScale++; });
+
+  let html = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <strong style="color:#c4a35a">Cipher Melody</strong><br>
+        ${cipherNotes.length} notes, ${cipherBeat.toFixed(1)} beats<br>
+        Range: E3–E4 (1 octave)<br>
+        E major fit: ${(100*cipherInScale/cN).toFixed(0)}%
+      </div>
+      <div>
+        <strong style="color:#5a8ac4">Salut d'Amour</strong><br>
+        ${salutNotes.length} notes, ${salutBeat.toFixed(1)} beats<br>
+        Range: G#4–C#6 (17 semitones)<br>
+        E major fit: ${(100*salutInScale/sN).toFixed(0)}%
+      </div>
+    </div>
+    <hr style="border-color:#222;margin:8px 0">
+    <strong>Correlations:</strong><br>
+    Pitch-class profile: r = ${pcCorr.toFixed(3)}<br>
+    Best 16-note contour: ${bestContour}/16 (${Math.round(100*bestContour/16)}%) at Salut[${bestSI}] × Cipher[${bestCI}]<br>
+    <br>
+    <strong>Interval matches:</strong>
+    ${Object.entries(bySize).sort((a,b)=>b[0]-a[0]).map(([s,c])=>`${s}-note: ${c}`).join(' | ')}<br>
+    Contour matches (≥75%): ${contourMatches.length}<br>
+    <br>
+    <strong>Top matches</strong> <span style="color:#666">(click to scroll)</span>
+    <div class="match-list">
+  `;
+
+  const unique = [];
+  const seen = new Set();
+  for (const m of matches.slice(0, 40)) {
+    const key = `${m.type}-${m.salutStart}-${m.cipherStart}-${m.size}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(m);
+    }
+    if (unique.length >= 15) break;
+  }
+
+  for (const m of unique) {
+    const salutRange = `Salut[${m.salutStart}-${m.salutEnd}]`;
+    const cipherRange = `Cipher[${m.cipherStart}-${m.cipherEnd}]`;
+    html += `<div class="match-entry" onclick="scrollToMatch(${m.cipherStart},${m.salutStart})">`
+      + `${m.label}: ${salutRange} ↔ ${cipherRange}</div>`;
+  }
+
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+function scrollToMatch(cIdx, sIdx) {
+  const el = document.getElementById('cipher-' + cIdx);
+  if (el) {
+    el.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
+    el.style.boxShadow = '0 0 12px #fff';
+    setTimeout(() => el.style.boxShadow = '', 2000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// AUDIO PLAYBACK
+// ═══════════════════════════════════════════════════════
+let audioCtx = null;
+let playing = false;
+let cipherTimeouts = [];
+let salutTimeouts = [];
+let playheadAnim = null;
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function midiToFreq(midi) { return 440 * Math.pow(2, (midi - 69) / 12); }
+
+function playNote(midi, durBeats, time, opts = {}) {
+  const ctx = getCtx();
+  const freq = midiToFreq(midi);
+  const tempo = parseInt(document.getElementById('tempoSlider').value);
+  const durSec = (durBeats * 60) / tempo;
+  const gain = opts.gain || 0.15;
+  const color = opts.color || 'warm';
+
+  // Main oscillator
+  const osc = ctx.createOscillator();
+  osc.type = color === 'warm' ? 'triangle' : 'sine';
+  osc.frequency.setValueAtTime(freq, time);
+
+  // Vibrato
+  const vib = ctx.createOscillator();
+  const vibGain = ctx.createGain();
+  vib.frequency.value = 5.5;
+  vibGain.gain.value = freq * 0.003;
+  vib.connect(vibGain);
+  vibGain.connect(osc.frequency);
+
+  // Harmonic
+  const harm = ctx.createOscillator();
+  harm.type = 'sine';
+  harm.frequency.setValueAtTime(freq * 2, time);
+  const harmGain = ctx.createGain();
+  harmGain.gain.value = gain * 0.12;
+  harm.connect(harmGain);
+
+  // Envelope
+  const env = ctx.createGain();
+  env.gain.setValueAtTime(0, time);
+  env.gain.linearRampToValueAtTime(gain, time + 0.04);
+  env.gain.linearRampToValueAtTime(gain * 0.7, time + durSec * 0.3);
+  env.gain.linearRampToValueAtTime(gain * 0.5, time + durSec * 0.8);
+  env.gain.linearRampToValueAtTime(0, time + durSec);
+
+  osc.connect(env);
+  harmGain.connect(env);
+  env.connect(ctx.destination);
+
+  osc.start(time);
+  harm.start(time);
+  vib.start(time);
+  osc.stop(time + durSec + 0.05);
+  harm.stop(time + durSec + 0.05);
+  vib.stop(time + durSec + 0.05);
+}
+
+function stopAll() {
+  playing = false;
+  cipherTimeouts.forEach(t => clearTimeout(t));
+  salutTimeouts.forEach(t => clearTimeout(t));
+  cipherTimeouts = [];
+  salutTimeouts = [];
+  if (playheadAnim) cancelAnimationFrame(playheadAnim);
+  document.getElementById('playhead').style.display = 'none';
+  document.querySelectorAll('.note-block.playing').forEach(el => el.classList.remove('playing'));
+  document.getElementById('infoBar').textContent = 'Stopped';
+}
+
+function schedulePlayback(playCipher, playSalut) {
+  stopAll();
+  playing = true;
+  const ctx = getCtx();
+  const tempo = parseInt(document.getElementById('tempoSlider').value);
+  const startTime = ctx.currentTime + 0.1;
+
+  // Schedule cipher
+  if (playCipher) {
+    cipherNotes.forEach((n, i) => {
+      const noteTime = startTime + (n.beat * 60) / tempo;
+      playNote(n.midi, n.dur, noteTime, {gain: 0.18, color: 'warm'});
+
+      const delayMs = (n.beat * 60 * 1000) / tempo;
+      const tid = setTimeout(() => {
+        if (!playing) return;
+        const el = document.getElementById('cipher-' + i);
+        if (el) {
+          el.classList.add('playing');
+          setTimeout(() => el.classList.remove('playing'), (n.dur * 60 * 1000) / tempo);
+        }
+        document.getElementById('infoBar').innerHTML =
+          `<span class="now-playing">Cipher [${i}]: ${n.name} "${n.letter}"</span>` +
+          (playSalut ? ' — playing together' : '');
+      }, delayMs * 1 + 100);
+      cipherTimeouts.push(tid);
+    });
+  }
+
+  // Schedule salut
+  if (playSalut) {
+    salutNotes.forEach((n, i) => {
+      const noteTime = startTime + (n.beat * 60) / tempo;
+      playNote(n.midi, n.dur, noteTime, {gain: 0.13, color: 'bright'});
+
+      const delayMs = (n.beat * 60 * 1000) / tempo;
+      const tid = setTimeout(() => {
+        if (!playing) return;
+        const el = document.getElementById('salut-' + i);
+        if (el) {
+          el.classList.add('playing');
+          setTimeout(() => el.classList.remove('playing'), (n.dur * 60 * 1000) / tempo);
+        }
+      }, delayMs * 1 + 100);
+      salutTimeouts.push(tid);
+    });
+  }
+
+  // Playhead animation
+  const playhead = document.getElementById('playhead');
+  playhead.style.display = 'block';
+  const startMs = performance.now();
+  const totalMs = (totalBeats * 60 * 1000) / tempo;
+
+  function animatePlayhead() {
+    if (!playing) return;
+    const elapsed = performance.now() - startMs;
+    const beatPos = (elapsed / 1000) * (tempo / 60);
+    playhead.style.left = beatToX(beatPos) + 'px';
+
+    // Auto-scroll
+    const container = document.getElementById('rollContainer');
+    const xPos = beatToX(beatPos);
+    if (xPos > container.scrollLeft + container.clientWidth * 0.7) {
+      container.scrollLeft = xPos - container.clientWidth * 0.3;
+    }
+
+    if (elapsed < totalMs + 500) {
+      playheadAnim = requestAnimationFrame(animatePlayhead);
+    } else {
+      playing = false;
+      playhead.style.display = 'none';
+      document.getElementById('infoBar').textContent = 'Playback complete';
+    }
+  }
+  playheadAnim = requestAnimationFrame(animatePlayhead);
+}
+
+function playBoth() { schedulePlayback(true, true); }
+function playCipherOnly() { schedulePlayback(true, false); }
+function playSalutOnly() { schedulePlayback(false, true); }
+
+// Tempo slider
+document.getElementById('tempoSlider').addEventListener('input', function() {
+  document.getElementById('tempoVal').textContent = this.value;
+});
+
+// Build on load
+buildRoll();
+buildStats();
+</script>
+</body>
+</html>
